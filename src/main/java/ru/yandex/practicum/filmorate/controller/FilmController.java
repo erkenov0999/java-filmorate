@@ -35,7 +35,4 @@ public class FilmController {
         return films;
     }
 
-    void test() {
-        System.out.println("TEST");
-    }
 }
