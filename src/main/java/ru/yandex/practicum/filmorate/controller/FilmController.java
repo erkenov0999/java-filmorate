@@ -34,4 +34,8 @@ public class FilmController {
     public Map<Long, Film> getAllFilms() {
         return films;
     }
+
+    void test() {
+        System.out.println("TEST");
+    }
 }
