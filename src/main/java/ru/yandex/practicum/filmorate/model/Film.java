@@ -1,12 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+
+import java.time.LocalDateTime;
 
 /**
  * Film.
  */
-@Getter
-@Setter
+@Data
 public class Film {
+
+    long id; //id фильма
+    String name; //название фильма
+    String description; //описание фильма
+    LocalDateTime releaseDate; //дата релиза фильма
+    long duration; //продолжительность фильма в минутах
 }
