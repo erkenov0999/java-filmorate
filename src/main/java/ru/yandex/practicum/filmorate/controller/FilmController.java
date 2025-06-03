@@ -17,7 +17,7 @@ public class FilmController {
     private Map<Long, Film> films = new HashMap<>();
 
     @PostMapping("/film")
-    public Film addNewFilms (@RequestBody Film film) {
+    public Film addNewFilms(@RequestBody Film film) {
         films.put(film.getId(), film);
         System.out.println("Фильм успешно добавлен!");
 
