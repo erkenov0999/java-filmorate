@@ -6,43 +6,37 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-/**
- * User.
- */
-
 @Data
 @Builder
 public class User {
-
-    private static long idCounter = 1; //статический счетчик для генерации id
-
-    private long id; //id пользователя
+    private Long id;
 
     @NotBlank(message = "Email не может быть пустым!")
     @Email(message = "Введите корректный email!")
-    private String email; //почта пользователя
+    private String email;
 
     @NotBlank(message = "Логин не может быть пустым!")
     @Pattern(regexp = "^\\S+$", message = "Пробелы в логине запрещены!")
-    private String login; //логин пользователя
+    private String login;
 
-    private String name; //никнейм пользователя
+    private String name;
 
-    @NotBlank(message = "Дата рождения не может быть пустой!")
+    @NotNull(message = "Дата рождения не может быть пустой!")
     @PastOrPresent(message = "Дата рождения не может быть позже текущего дня!")
-    private LocalDate birthday; //дата рождения пользователя
+    private LocalDate birthday;
 
-    public User createUser(String email, String login, String name, LocalDate birthday) {
-        return User.builder()
-                .id(idCounter++)
-                .email(email)
-                .login(login)
-                .name(checkName(name))
-                .birthday(birthday)
-                .build();
+    public static UserBuilder builder() {
+        return new CustomUserBuilder();
     }
 
-    public String checkName(String name) {
-        return (name == null || name.isBlank()) ? login : name;
+    private static class CustomUserBuilder extends UserBuilder {
+        @Override
+        public User build() {
+            User user = super.build();
+            if (user.getName() == null || user.getName().isBlank()) {
+                user.setName(user.getLogin());
+            }
+            return user;
+        }
     }
 }

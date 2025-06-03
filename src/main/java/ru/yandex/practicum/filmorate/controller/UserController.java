@@ -2,44 +2,51 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @RestController
+@RequestMapping("/users")
 public class UserController {
+    private final Map<Long, User> users = new HashMap<>();
+    private long idCounter = 1;
 
-    private Map<Long, User> users = new HashMap<>();
-
-    @PostMapping("/users")
+    @PostMapping
     public User addNewUser(@RequestBody User user) {
-        users.put(user.getId(), user);
-        System.out.println("Пользователь под ником " + user.getName() + " удачно зарегистрирован!");
-
-        log.info("Добавлен новый пользователь {}", user.toString());
-        return user;
-    }
-
-    @PutMapping("/users")
-    public User updateUser(@RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            users.replace(user.getId(), user);
-            System.out.println("Пользователь под ником " + user.getName() + " удачно обновлен!");
-            log.info("Пользователь {} обновлен", user.toString());
-        } else {
-            System.out.println("Ошибка при обновлении данных пользователя "
-                    + user.getName() + " проверьте корректность данных");
-            log.info("Ошибка при обновлении данных пользователя {}", user.toString());
+        // Проверка имени
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
         }
+
+        // Установка ID
+        user.setId(idCounter++);
+
+        users.put(user.getId(), user);
+        log.info("Добавлен новый пользователь: {}", user);
         return user;
     }
 
-    @GetMapping("/users")
+    @PutMapping
+    public User updateUser(@RequestBody User user) {
+        if (user.getId() == null || !users.containsKey(user.getId())) {
+            throw new ValidationException("Пользователь с ID " + user.getId() + " не найден");
+        }
+
+        // Проверка имени
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+
+        users.put(user.getId(), user);
+        log.info("Обновлен пользователь: {}", user);
+        return user;
+    }
+
+    @GetMapping
     public List<User> getAllUsers() {
-        return new ArrayList<User>(users.values());
+        return new ArrayList<>(users.values());
     }
 }
