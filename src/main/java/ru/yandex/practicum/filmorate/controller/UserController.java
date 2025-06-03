@@ -15,7 +15,7 @@ public class UserController {
 
     private Map<Long, User> users = new HashMap<>();
 
-    @PostMapping("/user")
+    @PostMapping("/users")
     public User addNewUser(@RequestBody User user) {
         users.put(user.getId(), user);
         System.out.println("Пользователь под ником " + user.getName() + " удачно зарегистрирован!");
@@ -24,7 +24,7 @@ public class UserController {
         return user;
     }
 
-    @PutMapping("/user")
+    @PutMapping("/users")
     public User updateUser(@RequestBody User user) {
         if (users.containsKey(user.getId())) {
             users.replace(user.getId(), user);

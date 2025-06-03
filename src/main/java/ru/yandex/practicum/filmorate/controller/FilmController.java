@@ -16,7 +16,7 @@ public class FilmController {
 
     private Map<Long, Film> films = new HashMap<>();
 
-    @PostMapping("/film")
+    @PostMapping("/films")
     public Film addNewFilms(@RequestBody Film film) {
         films.put(film.getId(), film);
         System.out.println("Фильм успешно добавлен!");
@@ -25,7 +25,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping("/film")
+    @PutMapping("/films")
     public Film updateFilm(@RequestBody Film film) {
         try {
             if (films.containsKey(film.getId())) {
