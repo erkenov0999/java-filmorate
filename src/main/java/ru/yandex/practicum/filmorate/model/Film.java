@@ -25,18 +25,21 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной!")
     private long duration;
 
-    public static FilmBuilder builder() {
-        return new CustomFilmBuilder();
+    public Film create(String name, String description, LocalDate releaseDate, long duration) {
+        Film film = Film.builder()
+                .name(name)
+                .description(description)
+                .releaseDate(releaseDateValidation(releaseDate))
+                .duration(duration)
+                .build();
+        return film;
     }
 
-    private static class CustomFilmBuilder extends FilmBuilder {
-        @Override
-        public Film build() {
-            Film film = super.build();
-            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
-            }
-            return film;
+    // Метод валидации даты релиза
+    private LocalDate releaseDateValidation(LocalDate releaseDate) {
+        if (releaseDate.isBefore(LocalDate.of(1895, 12, 28))) {
+            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
         }
+        return releaseDate;
     }
 }

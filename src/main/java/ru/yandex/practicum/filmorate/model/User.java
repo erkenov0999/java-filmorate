@@ -25,18 +25,21 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть позже текущего дня!")
     private LocalDate birthday;
 
-    public static UserBuilder builder() {
-        return new CustomUserBuilder();
+    public User create(String email, String login, String name, LocalDate birthday) {
+        User user = User.builder()
+                .email(email)
+                .login(login)
+                .name(nameValidation(name))
+                .birthday(birthday)
+                .build();
+        return user;
     }
 
-    private static class CustomUserBuilder extends UserBuilder {
-        @Override
-        public User build() {
-            User user = super.build();
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            return user;
+    // Метод валидации имени
+    private String nameValidation(String name) {
+        if (!(name == null || name.isBlank())) {
+            return name;
         }
+        return login;
     }
 }
