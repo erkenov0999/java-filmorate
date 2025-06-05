@@ -35,7 +35,7 @@ public class User {
     }
 
     // Метод валидации имени
-    private String nameValidation(String name) {
+    public String nameValidation(String name) {
         if (!(name == null || name.isBlank())) {
             return name;
         }
