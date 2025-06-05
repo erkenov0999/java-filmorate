@@ -26,13 +26,12 @@ public class User {
     private LocalDate birthday;
 
     public User create(String email, String login, String name, LocalDate birthday) {
-        User user = User.builder()
+        return User.builder()
                 .email(email)
                 .login(login)
                 .name(nameValidation(name))
                 .birthday(birthday)
                 .build();
-        return user;
     }
 
     // Метод валидации имени

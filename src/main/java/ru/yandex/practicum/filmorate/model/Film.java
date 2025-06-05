@@ -26,13 +26,12 @@ public class Film {
     private long duration;
 
     public Film create(String name, String description, LocalDate releaseDate, long duration) {
-        Film film = Film.builder()
+        return Film.builder()
                 .name(name)
                 .description(description)
                 .releaseDate(releaseDateValidation(releaseDate))
                 .duration(duration)
                 .build();
-        return film;
     }
 
     // Метод валидации даты релиза
