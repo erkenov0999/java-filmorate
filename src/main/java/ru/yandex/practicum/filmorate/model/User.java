@@ -25,20 +25,12 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть позже текущего дня!")
     private LocalDate birthday;
 
-    public User create(String email, String login, String name, LocalDate birthday) {
-        return User.builder()
-                .email(email)
-                .login(login)
-                .name(nameValidation(name))
-                .birthday(birthday)
-                .build();
-    }
 
-    // Метод валидации имени
-    public String nameValidation(String name) {
-        if (!(name == null || name.isBlank())) {
-            return name;
-        }
-        return login;
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
     }
 }

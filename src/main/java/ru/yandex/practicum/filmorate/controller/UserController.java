@@ -1,33 +1,37 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
     private final Map<Long, User> users = new HashMap<>();
-    private long idCounter = 1;
+    private static long idCounter = 1;
+
+    private final UserService userService;
 
     @PostMapping
     public User addNewUser(@Valid @RequestBody User user) {
-        // Проверка имени
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        User checked = userService.checkAndFillName(user);
 
-        // Установка ID
-        user.setId(idCounter++);
+        checked.setId(idCounter++);
 
-        users.put(user.getId(), user);
-        log.info("Добавлен новый пользователь: {}", user);
-        return user;
+        users.put(checked.getId(), checked);
+        log.info("Добавлен новый пользователь: {}", checked);
+        return checked;
     }
 
     @PutMapping
@@ -36,14 +40,11 @@ public class UserController {
             throw new ValidationException("Пользователь с ID " + user.getId() + " не найден");
         }
 
-        // Проверка имени
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
+        User checked = userService.checkAndFillName(user);
 
-        users.put(user.getId(), user);
-        log.info("Обновлен пользователь: {}", user);
-        return user;
+        users.put(checked.getId(), checked);
+        log.info("Обновлен пользователь: {}", checked);
+        return checked;
     }
 
     @GetMapping

@@ -25,6 +25,14 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной!")
     private long duration;
 
+    public Film(Long id, String name, String description, LocalDate releaseDate, long duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
+
     public Film create(String name, String description, LocalDate releaseDate, long duration) {
         return Film.builder()
                 .name(name)
@@ -41,4 +49,5 @@ public class Film {
         }
         return releaseDate;
     }
+
 }
