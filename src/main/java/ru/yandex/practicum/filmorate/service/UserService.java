@@ -1,9 +1,11 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.User;
 
 @Service
 public class UserService {
+    private static long idCounter = 1;
 
     public User checkAndFillName(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
@@ -11,5 +13,9 @@ public class UserService {
             return user;
         }
         return user;
+    }
+
+    public Long generateId() {
+        return idCounter++;
     }
 }

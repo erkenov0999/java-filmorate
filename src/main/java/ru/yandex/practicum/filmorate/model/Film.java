@@ -1,14 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
-import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.LocalDate;
 
 @Data
-@Builder
 public class Film {
     private Long id;
 
@@ -32,22 +29,4 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
     }
-
-    public Film create(String name, String description, LocalDate releaseDate, long duration) {
-        return Film.builder()
-                .name(name)
-                .description(description)
-                .releaseDate(releaseDateValidation(releaseDate))
-                .duration(duration)
-                .build();
-    }
-
-    // Метод валидации даты релиза
-    private LocalDate releaseDateValidation(LocalDate releaseDate) {
-        if (releaseDate.isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        return releaseDate;
-    }
-
 }

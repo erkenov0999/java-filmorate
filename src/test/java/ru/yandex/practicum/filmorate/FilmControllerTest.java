@@ -14,7 +14,6 @@ class FilmControllerTest {
 
     @BeforeEach
     void setUp() {
-        filmController = new FilmController();
     }
 
     @Test

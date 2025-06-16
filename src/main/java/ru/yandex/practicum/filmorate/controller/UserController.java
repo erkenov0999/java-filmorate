@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +19,6 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final Map<Long, User> users = new HashMap<>();
-    private static long idCounter = 1;
 
     private final UserService userService;
 
@@ -27,7 +26,7 @@ public class UserController {
     public User addNewUser(@Valid @RequestBody User user) {
         User checked = userService.checkAndFillName(user);
 
-        checked.setId(idCounter++);
+        checked.setId(userService.generateId());
 
         users.put(checked.getId(), checked);
         log.info("Добавлен новый пользователь: {}", checked);
@@ -36,8 +35,10 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        if (user.getId() == null || !users.containsKey(user.getId())) {
-            throw new ValidationException("Пользователь с ID " + user.getId() + " не найден");
+        Long id = user.getId();
+
+        if (id == null || !users.containsKey(id)) {
+            throw new ValidationException("Пользователь с ID " + id + " не найден");
         }
 
         User checked = userService.checkAndFillName(user);
