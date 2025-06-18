@@ -22,8 +22,7 @@ public class Film {
     @Positive(message = "Продолжительность фильма должна быть положительной!")
     private long duration;
 
-    public Film(Long id, String name, String description, LocalDate releaseDate, long duration) {
-        this.id = id;
+    public Film(String name, String description, LocalDate releaseDate, long duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
