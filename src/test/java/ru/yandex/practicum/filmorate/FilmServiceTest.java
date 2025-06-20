@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import jakarta.validation.Valid;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -21,11 +20,11 @@ public class FilmServiceTest {
         Film film = new Film("Test movie", "Testing movie",
                 LocalDate.of(1895, 12, 27), 100);
 
-        // Act
-        Film result = filmService.releaseDateValidation(film);
+        // Act & Assert
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> filmService.releaseDateValidation(film));
 
-        // Assert
-        assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", result);
+        assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", exception.getMessage());
     }
 
     @Test
