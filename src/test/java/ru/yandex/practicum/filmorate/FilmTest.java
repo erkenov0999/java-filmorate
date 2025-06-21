@@ -23,7 +23,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Правильно созданный фильм должен проходить валидацию")
-    void  validMovie_MustBeValidated(){
+    void  validMovie_MustBeValidated() {
         //Arrange
         Film film = new Film("Test movie", "Testing movie",
                 LocalDate.of(2025, 6, 1), 120);
@@ -37,7 +37,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("При пустом названии фильма, валидация не проходит")
-    void  ifNameIsEmpty_ValidationFails(){
+    void  ifNameIsEmpty_ValidationFails() {
         //Arrange
         Film film = new Film("", "Testing movie",
                 LocalDate.of(2025, 6, 1), 120);
@@ -51,7 +51,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Если описание фильма пустое, валидация не проходит")
-    void  ifDeskriptionIsEmpty_ValidationFails(){
+    void  ifDeskriptionIsEmpty_ValidationFails() {
         //Arrange
         Film film = new Film("Test movie", " ",
                 LocalDate.of(2025, 6, 1), 120);
@@ -65,7 +65,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Если в описании более 200 символов, валидация не пройдет")
-    void  description_contains_more_than_200_characters(){
+    void  description_contains_more_than_200_characters() {
         //Arrange
         Film film = new Film("Test movie", "Бывший киллер Джон Уик выходит из отставки, когда бандиты " +
                 "убивают его собаку — последний подарок умершей жены. Месть превращается в кровавую войну с мафией. " +
@@ -82,7 +82,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Если описание содержит менее 200 символов, валидация пройдет")
-    void description_contains_less_than_200_characters(){
+    void description_contains_less_than_200_characters() {
         //Arrange
         Film film = new Film("Test movie", "После гибели единственного друга — собаки — Джон Уик " +
                 "объявляет войну мафии. Культовый экшен с безупречными драками.",
@@ -97,7 +97,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Валидация не пройдет, если дата релиза пустая")
-    void release_date_is_blank(){
+    void release_date_is_blank() {
         //Arrange
         Film film = new Film("Test movie", "Testing movie", null, 120);
 
@@ -110,7 +110,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Если продолжительность фильма указана меньше нуля, валидация не пройдет")
-    void duration_film_is_negative(){
+    void duration_film_is_negative() {
         //Arrange
         Film film = new Film("Test movie", "Testing movie",
                 LocalDate.of(2025, 6, 1), -10);
@@ -124,7 +124,7 @@ public class FilmTest {
 
     @Test
     @DisplayName("Если продолжительность фильма равна 0, валидация не пройдет")
-    void duration_film_is_zero(){
+    void duration_film_is_zero() {
         //Arrange
         Film film = new Film("Test movie", "Testing movie",
                 LocalDate.of(2025, 6, 1), 0);
