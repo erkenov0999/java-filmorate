@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 @Service
 public class UserService {
-    private static long idCounter = 1;
+    private long idCounter = 1;
 
     public User checkAndFillName(User user) {
         if (user.getName() == null || user.getName().isBlank()) {

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Service
 public class FilmService {
-    private static long idCounter = 1;
+    private long idCounter = 1;
 
     public Film releaseDateValidation(Film film) {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
