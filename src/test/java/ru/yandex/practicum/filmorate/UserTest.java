@@ -120,13 +120,10 @@ class UserTest {
     @Test
     @DisplayName("Дата рождения в будущем должна вызывать ошибку валидации")
     void futureBirthday_ShouldFailValidation() {
-        // Arrange
         User user = new User("valid@email.com", "login", "Name", LocalDate.now().plusDays(1));
 
-        // Act
         var violations = validator.validate(user);
 
-        // Assert
         assertEquals(1, violations.size(), "Должны быть нарушения валидации для даты рождения в будущем");
     }
 }
