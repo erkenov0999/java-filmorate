@@ -29,8 +29,10 @@ class UserControllerTest {
     @Test
     @DisplayName("При добавлении пользователя возвращается корректный пользователь")
     void addNewUser_returns_correct_user() {
+        //Arrange & Act
         User result = userController.addNewUser(testUser);
 
+        //Assert
         assertNotNull(result);
         assertEquals(1, result.getId());
         assertEquals(testUser.getEmail(), result.getEmail());
@@ -42,8 +44,10 @@ class UserControllerTest {
     @Test
     @DisplayName("При обновлении пользователя данные изменяются корректно")
     void updateUser_changes_user_data_correctly() {
+        //Arrange
         User addedUser = userController.addNewUser(testUser);
 
+        //Act
         User updatedUser = new User(
                 "updated@email.com",
                 "updatedLogin",
@@ -54,6 +58,7 @@ class UserControllerTest {
 
         User result = userController.updateUser(updatedUser);
 
+        //Assert
         assertNotNull(result);
         assertEquals(addedUser.getId(), result.getId());
         assertEquals("updated@email.com", result.getEmail());
@@ -65,8 +70,10 @@ class UserControllerTest {
     @Test
     @DisplayName("При обновлении несуществующего пользователя выбрасывается исключение")
     void updateUser_throws_exception_when_user_not_found() {
+        //Arrange
         testUser.setId(999L);
 
+        // Act & Assert
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> userController.updateUser(testUser));
 
@@ -76,8 +83,10 @@ class UserControllerTest {
     @Test
     @DisplayName("При отсутствии пользователей возвращается пустой список")
     void getAllUsers_returns_empty_list_when_no_users() {
+        //Arrange & Act
         List<User> result = userController.getAllUsers();
 
+        //Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
@@ -85,10 +94,13 @@ class UserControllerTest {
     @Test
     @DisplayName("При наличии пользователей возвращается их список")
     void getAllUsers_returns_all_users_when_users_exist() {
+        //Arrange
         userController.addNewUser(testUser);
 
+        //Act
         List<User> result = userController.getAllUsers();
 
+        //Assert
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(testUser.getEmail(), result.get(0).getEmail());
@@ -98,6 +110,7 @@ class UserControllerTest {
     @Test
     @DisplayName("При пустом имени оно заменяется логином")
     void addNewUser_sets_login_as_name_when_name_is_empty() {
+        //Arrange
         User userWithoutName = new User(
                 "user@email.com",
                 "login",
@@ -105,8 +118,10 @@ class UserControllerTest {
                 LocalDate.of(1990, 1, 1)
         );
 
+        //Act
         User result = userController.addNewUser(userWithoutName);
 
+        //Assert
         assertNotNull(result);
         assertEquals("login", result.getName());
     }
@@ -114,6 +129,7 @@ class UserControllerTest {
     @Test
     @DisplayName("При имени из пробелов оно заменяется логином")
     void addNewUser_sets_login_as_name_when_name_is_blank() {
+        //Arrange
         User userWithBlankName = new User(
                 "user@email.com",
                 "login",
@@ -121,8 +137,10 @@ class UserControllerTest {
                 LocalDate.of(1990, 1, 1)
         );
 
+        //Act
         User result = userController.addNewUser(userWithBlankName);
 
+        //Assert
         assertNotNull(result);
         assertEquals("login", result.getName());
     }

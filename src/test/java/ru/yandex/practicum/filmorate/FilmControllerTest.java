@@ -33,10 +33,11 @@ class FilmControllerTest {
     @Test
     @DisplayName("При добавлении фильма возвращается корректный фильм")
     void addNewFilm_returns_correct_film() {
+        //Act
         Film result = filmController.addNewFilm(testFilm);
 
+        //Assert
         assertNotNull(result);
-        assertEquals(1L, result.getId());
         assertEquals("Test Movie", result.getName());
         assertEquals("Test Description", result.getDescription());
         assertEquals(LocalDate.of(2000, 1, 1), result.getReleaseDate());
@@ -46,8 +47,10 @@ class FilmControllerTest {
     @Test
     @DisplayName("При обновлении фильма данные изменяются корректно")
     void updateFilm_changes_film_data_correctly() {
+        //Arrange
         Film addedFilm = filmController.addNewFilm(testFilm);
 
+        //Act
         Film updatedFilm = new Film(
                 "Updated Movie",
                 "Updated Description",
@@ -58,6 +61,7 @@ class FilmControllerTest {
 
         Film result = filmController.updateFilm(updatedFilm);
 
+        //Assert
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals("Updated Movie", result.getName());
@@ -69,8 +73,10 @@ class FilmControllerTest {
     @Test
     @DisplayName("При обновлении несуществующего фильма выбрасывается исключение")
     void updateFilm_throws_exception_when_film_not_found() {
+        //Arrange
         testFilm.setId(999L);
 
+        // Act & Assert
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> filmController.updateFilm(testFilm));
 
@@ -80,8 +86,10 @@ class FilmControllerTest {
     @Test
     @DisplayName("При отсутствии фильмов возвращается пустой список")
     void getAllFilms_returns_empty_list_when_no_films() {
+        //Arrange
         List<Film> result = filmController.getAllFilms();
 
+        //Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
@@ -89,10 +97,13 @@ class FilmControllerTest {
     @Test
     @DisplayName("При наличии фильмов возвращается их список")
     void getAllFilms_returns_all_films_when_films_exist() {
+        //Arrange
         filmController.addNewFilm(testFilm);
 
+        //Act
         List<Film> result = filmController.getAllFilms();
 
+        //Assert
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Test Movie", result.get(0).getName());
@@ -102,6 +113,7 @@ class FilmControllerTest {
     @Test
     @DisplayName("При добавлении фильма генерируется новый ID")
     void addNewFilm_generates_new_id_for_each_film() {
+        //Arrange
         Film firstFilm = filmController.addNewFilm(testFilm);
         Film secondFilm = filmController.addNewFilm(new Film(
                 "Second Movie",
@@ -110,6 +122,7 @@ class FilmControllerTest {
                 90
         ));
 
+        //Assert
         assertEquals(1L, firstFilm.getId());
         assertEquals(2L, secondFilm.getId());
     }
@@ -117,6 +130,7 @@ class FilmControllerTest {
     @Test
     @DisplayName("При дате релиза раньше 28 декабря 1895 года выбрасывается исключение")
     void addNewFilm_throws_exception_when_release_date_too_early() {
+        //Arrange
         Film oldFilm = new Film(
                 "Old Movie",
                 "Old Description",
@@ -124,6 +138,7 @@ class FilmControllerTest {
                 60
         );
 
+        //Act & Assert
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> filmController.addNewFilm(oldFilm));
 
@@ -133,8 +148,10 @@ class FilmControllerTest {
     @Test
     @DisplayName("При обновлении с датой релиза раньше 28 декабря 1895 года выбрасывается исключение")
     void updateFilm_throws_exception_when_release_date_too_early() {
+        //Arrange
         Film addedFilm = filmController.addNewFilm(testFilm);
 
+        // Act & Assert
         Film invalidFilm = new Film(
                 "Invalid Movie",
                 "Invalid Description",
