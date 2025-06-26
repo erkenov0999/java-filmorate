@@ -1,13 +1,12 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.storage.film;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,16 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/films")
-public class FilmController {
+@Component
+public abstract class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
 
-    private final FilmService filmService;
-    InMemoryFilmStorage filmStorage;
+    FilmService filmService;
 
-    @PostMapping
+
+    @Override
     public Film addNewFilm(@Valid @RequestBody Film film) {
         Film checked = filmService.releaseDateValidation(film);
 
@@ -35,7 +32,7 @@ public class FilmController {
         return checked;
     }
 
-    @PutMapping
+    @Override
     public Film updateFilm(@Valid @RequestBody Film film) {
         Long id = film.getId();
 
@@ -50,7 +47,20 @@ public class FilmController {
         return checked;
     }
 
-    @GetMapping
+    @Override
+    public void deleteFilm(Film film) {
+        Long id = film.getId();
+
+        if (id == null || !films.containsKey(id)) {
+            throw new ValidationException("Фильм \"" + film.getName() + "\" не найден");
+        }
+
+        films.remove(id);
+        log.info("Удален фильм: {}", film.getName());
+        System.out.println("Фильм \"" + film.getName() + "\" удален");
+    }
+
+    @Override
     public List<Film> getAllFilms() {
         return new ArrayList<>(films.values());
     }
