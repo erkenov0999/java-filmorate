@@ -40,8 +40,7 @@ public class FilmService {
 
         film.getLikes().add(user.getId());
         updateTopFilms(film);
-        log.info("Пользователь с идентификатором " + user.getId()
-                + " поставил лайк на фильм с id " + film.getId());
+        log.info("Пользователь с идентификатором {} поставил лайк на фильм с id {}.", user.getName() ,film.getId());
 
         return (long) film.getLikes().size();
     }
@@ -54,7 +53,7 @@ public class FilmService {
 
         film.getLikes().remove(user.getId());
         updateTopFilms(film);
-        log.info("Пользователь " + user.getId() + " убрал лайк с фильма с id " + film.getId());
+        log.info("Пользователь {} убрал лайк с фильма с id {}",user.getName(), film.getId());
 
         return (long) film.getLikes().size();
     }
