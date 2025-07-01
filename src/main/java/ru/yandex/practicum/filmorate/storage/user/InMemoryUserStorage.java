@@ -64,4 +64,10 @@ public abstract class InMemoryUserStorage implements UserStorage {
     public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
     }
+
+    @Override
+    public User getUserById(User user) {
+        long id = user.getId();
+        return users.get(id);
+    }
 }
