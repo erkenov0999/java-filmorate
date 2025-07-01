@@ -4,54 +4,34 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    private final Map<Long, Film> films = new HashMap<>();
-
-    private final FilmService filmService;
     InMemoryFilmStorage filmStorage;
 
     @PostMapping
-    public Film addNewFilm(@Valid @RequestBody Film film) {
-        Film checked = filmService.releaseDateValidation(film);
-
-        checked.setId(filmService.generateId());
-
-        films.put(checked.getId(), checked);
-        log.info("Добавлен новый фильм: {}", checked.getName());
-        return checked;
+    public void addNewFilm(@Valid @RequestBody Film film) {
+        filmStorage.addNewFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
-        Long id = film.getId();
+    public void updateFilm(@Valid @RequestBody Film film) {
+        filmStorage.updateFilm(film);
+    }
 
-        if (id == null || !films.containsKey(id)) {
-            throw new ValidationException("Фильм с ID " + id + " не найден");
-        }
-
-        Film checked = filmService.releaseDateValidation(film);
-
-        films.put(checked.getId(), checked);
-        log.info("Обновлен фильм: {}", checked.getName());
-        return checked;
+    @DeleteMapping
+    public void deleteFilm(@Valid @RequestBody Film film) {
+        filmStorage.deleteFilm(film);
     }
 
     @GetMapping
-    public List<Film> getAllFilms() {
-        return new ArrayList<>(films.values());
+    public void getAllFilms() {
+        filmStorage.getAllFilms();
     }
 }

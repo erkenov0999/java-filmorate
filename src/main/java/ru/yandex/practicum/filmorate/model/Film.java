@@ -4,10 +4,12 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class Film {
     private Long id;
+    private Set<Long> likes;
 
     @NotBlank(message = "Название фильма не может быть пустым!")
     private String name;
