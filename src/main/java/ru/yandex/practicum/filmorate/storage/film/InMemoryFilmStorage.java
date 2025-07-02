@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -18,8 +20,12 @@ import java.util.Map;
 public abstract class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
 
-    FilmService filmService;
+    private final FilmService filmService;
 
+    @Autowired
+    public InMemoryFilmStorage(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @Override
     public Film addNewFilm(@Valid @RequestBody Film film) {
@@ -33,11 +39,12 @@ public abstract class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) throws ResponseStatusException{
         Long id = film.getId();
 
         if (id == null || !films.containsKey(id)) {
-            throw new ValidationException("Фильм с ID " + id + " не найден");
+            log.error("При обновлении фильма с ID {} , произошла ошибка, фильм не найден", id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм с ID " + id + " не найден");
         }
 
         Film checked = filmService.releaseDateValidation(film);
@@ -48,11 +55,12 @@ public abstract class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Film film) {
+    public void deleteFilm(Film film) throws ResponseStatusException {
         Long id = film.getId();
 
         if (id == null || !films.containsKey(id)) {
-            throw new ValidationException("Фильм \"" + film.getName() + "\" не найден");
+            log.error("При удалении фильма с ID {} произошла ошибка, фильм не найден", id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм с ID " + id + " не найден");
         }
 
         films.remove(id);
@@ -63,5 +71,16 @@ public abstract class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getAllFilms() {
         return new ArrayList<>(films.values());
+    }
+
+    @Override
+    public Film getFilmById(long id) throws ResponseStatusException {
+        if (!films.containsKey(id)) {
+            log.error("Фильм не найден по ID {}, так как отсутсвует в хранилище", id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм с ID " + id + " не найден!");
+        }
+
+        log.info("Поиск фильма по ID: {}", films.get(id).getName());
+        return films.get(id);
     }
 }

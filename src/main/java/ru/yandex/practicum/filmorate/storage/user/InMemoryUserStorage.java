@@ -66,8 +66,7 @@ public abstract class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(User user) {
-        long id = user.getId();
+    public User getUserById(long id) {
         return users.get(id);
     }
 }
