@@ -2,8 +2,11 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -15,17 +18,21 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public abstract class InMemoryUserStorage implements UserStorage {
+public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
-    UserService userService;
+    private long idCounter = 1;
 
+
+    public Long generateId() {
+        return idCounter++;
+    }
 
     @Override
-    public User addNewUser(@Valid @RequestBody User user) {
-        User checked = userService.checkAndFillName(user);
+    public User addNewUser(User user) {
+        User checked = checkAndFillName(user);
 
-        checked.setId(userService.generateId());
+        checked.setId(generateId());
 
         users.put(checked.getId(), checked);
         log.info("Добавлен новый пользователь: {}", checked);
@@ -33,14 +40,14 @@ public abstract class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(@Valid @RequestBody User user) {
+    public User updateUser(User user) throws ResponseStatusException {
         Long id = user.getId();
 
         if (id == null || !users.containsKey(id)) {
-            throw new ValidationException("Пользователь с ID " + id + " не найден");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с ID " + id + " не найден");
         }
 
-        User checked = userService.checkAndFillName(user);
+        User checked = checkAndFillName(user);
 
         users.put(checked.getId(), checked);
         log.info("Обновлен пользователь: {}", checked);
@@ -48,11 +55,11 @@ public abstract class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void deleteUser(User user) {
+    public void deleteUser(User user) throws ResponseStatusException {
         Long id = user.getId();
 
         if (id == null || !users.containsKey(id)) {
-            throw new ValidationException("Пользователь \"" + user.getName() + "\" не найден");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь \"" + user.getName() + "\" не найден");
         }
 
         users.remove(id);
@@ -68,5 +75,13 @@ public abstract class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUserById(long id) {
         return users.get(id);
+    }
+
+    public User checkAndFillName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+            return user;
+        }
+        return user;
     }
 }

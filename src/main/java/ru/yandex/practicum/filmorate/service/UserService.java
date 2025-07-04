@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,21 +15,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
-    UserStorage userStorage;
+    InMemoryUserStorage userStorage;
 
-    private long idCounter = 1;
 
-    public User checkAndFillName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-            return user;
-        }
-        return user;
+    @Autowired
+    public UserService(InMemoryUserStorage userStorage) {
+        this.userStorage = userStorage;
     }
 
-    public Long generateId() {
-        return idCounter++;
-    }
 
     public void addNewFriend(User user, long friendId) {
         User friend = userStorage.getUserById(friendId);

@@ -24,29 +24,12 @@ public class FilmService {
 
     private final InMemoryFilmStorage filmStorage;
 
-    public static final LocalDate RELEASE_DATE_LOWER_BOUND = LocalDate.of(1895, 12, 28);
-    private long idCounter = 1;
-
 
     @Autowired
     public FilmService(InMemoryFilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
-
-    public Film releaseDateValidation(Film film) throws ResponseStatusException {
-        if (film.getReleaseDate().isBefore(RELEASE_DATE_LOWER_BOUND)) {
-            log.error("Дата релиза не может быть раньше 28 декабря 1895 года");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-
-        return film;
-    }
-
-    public Long generateId() {
-        return idCounter++;
-    }
 
     public void putLike(long idFilm, long idUser) throws ResponseStatusException {
         Film film = filmStorage.getFilmById(idFilm);
@@ -91,9 +74,13 @@ public class FilmService {
     }
 
     public Set<Film> getTopFilms(int limit) {
-        if (limit < 1) {
-            log.error("Запрашиваемый топ меньше или равен 0");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Запрашиваемый топ должен быть больше 0!");
+        if (limit < 0) {
+            log.error("Запрашиваемый топ меньше 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Запрашиваемый топ не может быть отрицательным!");
+        }
+
+        if (limit == 0) {
+            limit = 10;
         }
 
         log.info("Запрошен топ-{} фильмов, ТОП-", limit);

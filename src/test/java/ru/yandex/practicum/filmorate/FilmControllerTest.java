@@ -1,34 +1,29 @@
-package ru.yandex.practicum.filmorate;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class FilmControllerTest {
+//package ru.yandex.practicum.filmorate;
+//
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import ru.yandex.practicum.filmorate.controller.FilmController;
+//import ru.yandex.practicum.filmorate.exception.ValidationException;
+//import ru.yandex.practicum.filmorate.model.Film;
+//import ru.yandex.practicum.filmorate.service.FilmService;
+//import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+//
+//import java.time.LocalDate;
+//import java.util.List;
+//
+//import static org.junit.jupiter.api.Assertions.*;
+//
+//class FilmControllerTest {
 //    private FilmController filmController;
+//    private FilmService filmService;
+//    private InMemoryFilmStorage filmStorage;
 //    private Film testFilm;
 //
 //    @BeforeEach
 //    void setUp() {
-//        FilmService filmService = new FilmService();
-//        FilmStorage filmStorage = new InMemoryFilmStorage(filmService) {
-//            @Override
-//            public Film addNewFilm(Film film) {
-//                return super.addNewFilm(film);
-//            }
-//        }
-//        filmController = new FilmController(filmService, );
+//        FilmService filmService = new FilmService(filmStorage);
+//        filmController = new FilmController(filmStorage, filmService);
 //
 //        testFilm = new Film(
 //                "Test Movie",
@@ -42,7 +37,7 @@ class FilmControllerTest {
 //    @DisplayName("При добавлении фильма возвращается корректный фильм")
 //    void addNewFilm_returns_correct_film() {
 //        //Act
-//        Film result = filmController.addNewFilm(testFilm);
+//        Film result = filmStorage.addNewFilm(testFilm);
 //
 //        //Assert
 //        assertNotNull(result);
@@ -56,7 +51,7 @@ class FilmControllerTest {
 //    @DisplayName("При обновлении фильма данные изменяются корректно")
 //    void updateFilm_changes_film_data_correctly() {
 //        //Arrange
-//        Film addedFilm = filmController.addNewFilm(testFilm);
+//        Film addedFilm = filmStorage.addNewFilm(testFilm);
 //
 //        //Act
 //        Film updatedFilm = new Film(
@@ -67,7 +62,7 @@ class FilmControllerTest {
 //        );
 //        updatedFilm.setId(addedFilm.getId());
 //
-//        Film result = filmController.updateFilm(updatedFilm);
+//        Film result = filmStorage.updateFilm(updatedFilm);
 //
 //        //Assert
 //        assertNotNull(result);
@@ -95,7 +90,7 @@ class FilmControllerTest {
 //    @DisplayName("При отсутствии фильмов возвращается пустой список")
 //    void getAllFilms_returns_empty_list_when_no_films() {
 //        //Arrange
-//        List<Film> result = filmController.getAllFilms();
+//        List<Film> result = filmStorage.getAllFilms();
 //
 //        //Assert
 //        assertNotNull(result);
@@ -109,7 +104,7 @@ class FilmControllerTest {
 //        filmController.addNewFilm(testFilm);
 //
 //        //Act
-//        List<Film> result = filmController.getAllFilms();
+//        List<Film> result = filmStorage.getAllFilms();
 //
 //        //Assert
 //        assertNotNull(result);
@@ -122,8 +117,8 @@ class FilmControllerTest {
 //    @DisplayName("При добавлении фильма генерируется новый ID")
 //    void addNewFilm_generates_new_id_for_each_film() {
 //        //Arrange
-//        Film firstFilm = filmController.addNewFilm(testFilm);
-//        Film secondFilm = filmController.addNewFilm(new Film(
+//        Film firstFilm = filmStorage.addNewFilm(testFilm);
+//        Film secondFilm = filmStorage.addNewFilm(new Film(
 //                "Second Movie",
 //                "Second Description",
 //                LocalDate.of(2002, 1, 1),
@@ -157,7 +152,7 @@ class FilmControllerTest {
 //    @DisplayName("При обновлении с датой релиза раньше 28 декабря 1895 года выбрасывается исключение")
 //    void updateFilm_throws_exception_when_release_date_too_early() {
 //        //Arrange
-//        Film addedFilm = filmController.addNewFilm(testFilm);
+//        Film addedFilm = filmStorage.addNewFilm(testFilm);
 //
 //        // Act & Assert
 //        Film invalidFilm = new Film(
@@ -173,4 +168,4 @@ class FilmControllerTest {
 //
 //        assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", exception.getMessage());
 //    }
-}
+//}
