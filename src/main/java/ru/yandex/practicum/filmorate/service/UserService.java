@@ -24,16 +24,19 @@ public class UserService {
     }
 
 
-    public void addNewFriend(User user, long friendId) {
+    public void addNewFriend(long firstUser, long friendId) {
+        User user = userStorage.getUserById(firstUser);
         User friend = userStorage.getUserById(friendId);
 
         checkingBeforeAddingFriends(user, friendId);
 
         user.getFriends().add(friendId);
-        friend.getFriends().add(user.getId());
-        userStorage.updateUser(user);
+        friend.getFriends().add(firstUser);
 
-        log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, user.getId());
+        userStorage.updateUser(user);
+        userStorage.updateUser(friend);
+
+        log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, firstUser);
 
         System.out.println("Пользователи " + user.getName() + " и "
                 + friend.getName() + " добавили друг друга в друзья");

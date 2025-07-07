@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -27,15 +28,15 @@ public class FilmController {
     }
 
     @PostMapping
-    public void addNewFilm(@Valid @RequestBody Film film) {
+    public Film addNewFilm(@Valid @RequestBody Film film) {
         log.info("Добавление нового фильма: {}", film);
-        filmStorage.addNewFilm(film);
+        return filmStorage.addNewFilm(film);
     }
 
     @PutMapping
-    public void updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         log.info("Внесение изменений в фильм: {}", film);
-        filmStorage.updateFilm(film);
+        return filmStorage.updateFilm(film);
     }
 
     @DeleteMapping
@@ -45,9 +46,9 @@ public class FilmController {
     }
 
     @GetMapping
-    public void getAllFilms() {
+    public List<Film> getAllFilms() {
         log.info("Получение списка всех фильмов");
-        filmStorage.getAllFilms();
+        return filmStorage.getAllFilms();
     }
 
     @PutMapping("/{id}/like/{userId}")

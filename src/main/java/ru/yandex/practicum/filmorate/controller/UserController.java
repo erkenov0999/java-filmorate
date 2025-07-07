@@ -9,6 +9,9 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
+import java.util.List;
+import java.util.Set;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -42,13 +45,13 @@ public class UserController {
     }
 
     @GetMapping
-    public void getAllUsers() {
+    public List<User> getAllUsers() {
         log.info("Получения списка всех пользователей");
-        userStorage.getAllUsers();
+        return userStorage.getAllUsers();
     }
 
     @PutMapping("{id}/friends/{friendId}")
-    public void addNewFriend(@Valid @RequestBody User user, @PathVariable int friendId) {
+    public void addNewFriend(@Valid @RequestBody int user, @PathVariable int friendId) {
         log.info("Пользователь {} добавил нового друга", user);
         userService.addNewFriend(user, friendId);
     }
@@ -60,14 +63,14 @@ public class UserController {
     }
 
     @GetMapping("{id}/friends")
-    public void getFriends(@PathVariable int id) {
+    public Set<User> getFriends(@PathVariable int id) {
         log.info("Список друзей пользователя с ID {}", id);
-        userService.getFriends(id);
+        return userService.getFriends(id);
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
-    public void getFriendsCommon(@PathVariable int otherId, @PathVariable int id) {
+    public Set<Long> getFriendsCommon(@PathVariable int otherId, @PathVariable int id) {
         log.info("Список общих друзей между пользователем ID-{} и пользователем ID-{}", otherId, id);
-        userService.checkCommonFriends(otherId, id);
+        return userService.checkCommonFriends(otherId, id);
     }
 }

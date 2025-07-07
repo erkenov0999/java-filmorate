@@ -45,7 +45,7 @@
 //
 //    @Test
 //    @DisplayName("Если дата релиза позже 28 декабря 1895 года, валидация пройдет")
-//    void releaseDate_is_after_minimum_date() {
+//    void addNewUser_releaseDate_is_after_minimum_date() {
 //        //Arrange
 //        Film film = new Film("Test movie", "Testing movie",
 //                LocalDate.of(1895, 12, 29), 100);

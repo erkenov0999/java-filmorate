@@ -84,6 +84,7 @@ public class FilmService {
         }
 
         log.info("Запрошен топ-{} фильмов, ТОП-", limit);
+
         return topFilms.stream()
                 .limit(limit)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
