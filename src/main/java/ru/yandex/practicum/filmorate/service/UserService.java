@@ -24,25 +24,26 @@ public class UserService {
     }
 
 
-    public void addNewFriend(long firstUser, long friendId) {
-        User user = userStorage.getUserById(firstUser);
+    public void addNewFriend(long userId, long friendId) throws ResponseStatusException {
+        User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
 
         checkingBeforeAddingFriends(user, friendId);
 
         user.getFriends().add(friendId);
-        friend.getFriends().add(firstUser);
+        friend.getFriends().add(userId);
 
-        userStorage.updateUser(user);
-        userStorage.updateUser(friend);
+        //userStorage.updateUser(user);
+        //userStorage.updateUser(friend);
 
-        log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, firstUser);
+        log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, userId);
 
         System.out.println("Пользователи " + user.getName() + " и "
                 + friend.getName() + " добавили друг друга в друзья");
     }
 
-    public void deleteFromFriends(User user, long friendId) {
+    public void deleteFromFriends(long id, long friendId) {
+        User user= userStorage.getUserById(id);
         User friend = userStorage.getUserById(friendId);
 
         checkingBeforeAddingFriends(user, friendId);
@@ -68,31 +69,33 @@ public class UserService {
         return friends;
     }
 
-    public Set<Long> checkCommonFriends(long firstUserId, long secondUserId) {
+    public Set<Long> getCommonFriends(long firstUserId, long secondUserId) {
         User firstUser = userStorage.getUserById(firstUserId);
         User secondUser = userStorage.getUserById(secondUserId);
 
-        return firstUser.getFriends().stream()
-                .filter(secondUser.getFriends()::contains)
-                .collect(Collectors.toSet());
+        Set<Long> commonFriends = new HashSet<>(firstUser.getFriends());
+        commonFriends.retainAll(secondUser.getFriends());
+        log.info("Вывод списка общих друзей между пользователям {} и пользователем {}", firstUserId, secondUserId);
+
+        return commonFriends;
     }
 
     private void checkingBeforeAddingFriends(User user, long friendId) {
-        Long userId = userStorage.getUserById(user.getId()).getId();
+        long userId = user.getId();
 
-        if (userId == null) {
-            log.error("Не удалось найти пользователя с ID {} для добавления/удаления друга.", user.getId());
+        if (userStorage.getUserById(userId) == null) {
+            log.error("Не удалось найти пользователя с ID {} для добавления/удаления друга.", userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID "
                     + user.getId() + " для добавления/удаления друга.");
         }
 
-        if (friendId == 0) {
+        if (userStorage.getUserById(friendId) == null) {
             log.error("Не удалось найти пользователя с ID {} для добавления/удаления друга.", friendId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID "
                     + friendId + " для добавления/удаления друга.");
         }
 
-        if (userId.equals(friendId)) {
+        if (userId == friendId) {
             log.error("Запрещено добавлять в друзья или удалять самого себя {}", friendId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Запрещено выполнять это действие с самим собой.");
         }
