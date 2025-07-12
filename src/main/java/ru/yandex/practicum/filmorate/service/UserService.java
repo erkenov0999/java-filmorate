@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,13 +27,10 @@ public class UserService {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
 
-        checkingBeforeAddingFriends(user, friendId);
+        checkingBeforeAddingFriends(userId, friendId);
 
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
-
-        //userStorage.updateUser(user);
-        //userStorage.updateUser(friend);
 
         log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, userId);
 
@@ -42,11 +38,11 @@ public class UserService {
                 + friend.getName() + " добавили друг друга в друзья");
     }
 
-    public void deleteFromFriends(long id, long friendId) {
+    public void deleteFromFriends(long id, long friendId) throws ResponseStatusException {
+        checkingBeforeAddingFriends(id, friendId);
+
         User user= userStorage.getUserById(id);
         User friend = userStorage.getUserById(friendId);
-
-        checkingBeforeAddingFriends(user, friendId);
 
         user.getFriends().remove(friendId);
         friend.getFriends().remove(user.getId());
@@ -58,7 +54,12 @@ public class UserService {
                 + friend.getName() + " удалили друг друга из друзей");
     }
 
-    public Set<User> getFriends(long userId) {
+    public Set<User> getFriends(long userId) throws ResponseStatusException {
+        if (userStorage.getUserById(userId) == null) {
+            log.info("Пользователь с переданным ID={} не найден", userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь с переданным ID не найден");
+        }
+
         User user = userStorage.getUserById(userId);
 
         Set<User> friends = new HashSet<>();
@@ -69,24 +70,29 @@ public class UserService {
         return friends;
     }
 
-    public Set<Long> getCommonFriends(long firstUserId, long secondUserId) {
+    public Set<User> getCommonFriends(long firstUserId, long secondUserId) throws ResponseStatusException {
+        checkingBeforeAddingFriends(firstUserId, secondUserId);
+
         User firstUser = userStorage.getUserById(firstUserId);
         User secondUser = userStorage.getUserById(secondUserId);
 
-        Set<Long> commonFriends = new HashSet<>(firstUser.getFriends());
-        commonFriends.retainAll(secondUser.getFriends());
+        Set<Long> commonFriends = new HashSet<>(secondUser.getFriends());
+        commonFriends.retainAll(firstUser.getFriends());
+
+        Set<User> friends = new HashSet<>();
+        for (long friendId : commonFriends) {
+            friends.add(userStorage.getUserById(friendId));
+        }
         log.info("Вывод списка общих друзей между пользователям {} и пользователем {}", firstUserId, secondUserId);
 
-        return commonFriends;
+        return friends;
     }
 
-    private void checkingBeforeAddingFriends(User user, long friendId) {
-        long userId = user.getId();
-
+    private void checkingBeforeAddingFriends(long userId, long friendId) throws ResponseStatusException {
         if (userStorage.getUserById(userId) == null) {
             log.error("Не удалось найти пользователя с ID {} для добавления/удаления друга.", userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID "
-                    + user.getId() + " для добавления/удаления друга.");
+                    + userId + " для добавления/удаления друга.");
         }
 
         if (userStorage.getUserById(friendId) == null) {

@@ -7,31 +7,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Slf4j
 @Service
 public class FilmService {
-    private final Set<Film> topFilms = new TreeSet<>(
-            Comparator.comparingInt((Film film) -> -film.getLikes().size())
-                    .thenComparing(Film::getId));
+    private List<Film> topFilms = new ArrayList<>();
 
     private final InMemoryFilmStorage filmStorage;
+    private final InMemoryUserStorage userStorage;
 
 
     @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage) {
+    public FilmService(InMemoryFilmStorage filmStorage, InMemoryUserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
 
     public void putLike(long idFilm, long idUser) throws ResponseStatusException {
+        chekingFilmAndUser(idFilm, idUser);
+
         Film film = filmStorage.getFilmById(idFilm);
 
         if(film.getLikes().contains(idUser)) {
@@ -41,11 +41,13 @@ public class FilmService {
         }
 
         film.getLikes().add(idUser);
-        updateTopFilms(film);
+        updateAndSortFilms(film);
         log.info("Пользователь с идентификатором {} поставил лайк на фильм с id {}.", idUser, film.getId());
     }
 
     public void removeLike(long idFilm, long idUser) throws ResponseStatusException {
+        chekingFilmAndUser(idFilm, idUser);
+
         Film film = filmStorage.getFilmById(idFilm);
 
         if (!film.getLikes().contains(idUser)) {
@@ -56,37 +58,48 @@ public class FilmService {
         }
 
         film.getLikes().remove(idUser);
-        updateTopFilms(film);
+        updateAndSortFilms(film);
         log.info("Пользователь {} убрал лайк с фильма с id {}", idUser, film.getId());
     }
 
-    private void updateTopFilms(Film film) {
-        topFilms.remove(film);
-        topFilms.add(film);
-
-        if (topFilms.size() > 10) {
-            Film lastFilm = topFilms.stream()
-                    .skip(10 - 1)
-                    .findFirst()
-                    .orElse(null);
-            topFilms.remove(lastFilm);
+    private void updateAndSortFilms(Film film) throws ResponseStatusException {
+        List<Film> films = new ArrayList<>(filmStorage.getAllFilms());
+        if (films.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Список фильмов пока еще пуст");
         }
+
+        films.sort(Comparator.comparingInt((Film movie) -> film.getLikes().size()).reversed());
+        topFilms = films;
+        log.info("Произошли обновления в топе фильмов");
     }
 
-    public Set<Film> getTopFilms(int limit) {
-        if (limit < 0) {
-            log.error("Запрашиваемый топ меньше 0");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Запрашиваемый топ не может быть отрицательным!");
+    public List<Film> getTopFilms(int limit) {
+        List<Film> films = new ArrayList<>(topFilms);
+        List<Film> topFilms = new ArrayList<>();
+        long listSize = films.size();
+
+        if (limit <= 0) {
+            for (int i = 0; i < 11 && i < listSize; i++) {
+                topFilms.add(films.get(i));
+            }
         }
 
-        if (limit == 0) {
-            limit = 10;
+        for (int i = 0; i < limit && i < listSize; i++) {
+            topFilms.add(films.get(i));
+        }
+        return topFilms;
+    }
+
+    private void chekingFilmAndUser(long filmId, long userId) throws ResponseStatusException {
+        if (userStorage.getUserById(userId) == null) {
+            log.error("Не удалось найти пользователя с ID {} ", userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID "
+                    + userId);
         }
 
-        log.info("Запрошен топ-{} фильмов, ТОП-", limit);
-
-        return topFilms.stream()
-                .limit(limit)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (filmStorage.getFilmById(filmId) == null) {
+            log.error("Не удалось найти фильм с ID {} ", filmId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти фильм с ID " + filmId);
+        }
     }
 }

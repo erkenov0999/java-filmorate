@@ -69,7 +69,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Set<Long> getFriendsCommon(@PathVariable long otherId, @PathVariable long id) {
+    public Set<User> getFriendsCommon(@PathVariable long otherId, @PathVariable long id) {
         log.info("Список общих друзей между пользователем ID-{} и пользователем ID-{}", otherId, id);
         return userService.getCommonFriends(otherId, id);
     }
