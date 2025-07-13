@@ -68,7 +68,7 @@ public class FilmService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Список фильмов пока еще пуст");
         }
 
-        films.sort(Comparator.comparingInt((Film movie) -> film.getLikes().size()).reversed());
+        films.sort(Comparator.comparingInt((Film movie) -> movie.getLikes().size()).reversed());
         topFilms = films;
         log.info("Произошли обновления в топе фильмов");
     }
@@ -77,12 +77,6 @@ public class FilmService {
         List<Film> films = new ArrayList<>(topFilms);
         List<Film> topFilms = new ArrayList<>();
         long listSize = films.size();
-
-        if (limit <= 0) {
-            for (int i = 0; i < 11 && i < listSize; i++) {
-                topFilms.add(films.get(i));
-            }
-        }
 
         for (int i = 0; i < limit && i < listSize; i++) {
             topFilms.add(films.get(i));
