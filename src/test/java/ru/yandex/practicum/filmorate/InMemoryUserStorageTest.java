@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class InMemoryUserStorageTest {
     private final InMemoryUserStorage userStorage = new InMemoryUserStorage();
@@ -80,5 +81,37 @@ public class InMemoryUserStorageTest {
         assertEquals(result, userStorage.getUsers().get(result.getId()),
                 "Созданный пользователь должен появится в хранилище пользователей");
 
+    }
+
+    @Test
+    @DisplayName("Обновление данных пользователя, после обновления должен возвращать изменный вариант пользователя")
+    void update_user_test() {
+        //Arrange
+        User user = new User("validemail@mail.ru", "validlogin", "Islam",
+                LocalDate.of(1996, 9, 29));
+        userStorage.addNewUser(user);
+
+        //Act
+        user.setName("Petya");
+        userStorage.updateUser(user);
+
+        //Assert
+        assertEquals(user, userStorage.getUsers().get(user.getId()), "Пользователь обновлен и перезаписан в хранилище");
+    }
+
+    @Test
+    @DisplayName("При удалении пользователя, он должен удалиться из хранилища")
+    void delete_user_test() {
+        //Arrange
+        User user = new User("validemail@mail.ru", "validlogin", "Islam",
+                LocalDate.of(1996, 9, 29));
+        userStorage.addNewUser(user);
+        Long userId = user.getId();
+
+        //Act
+        userStorage.deleteUser(user);
+
+        //Assert
+        assertNull(userStorage.getUsers().get(userId), "Удаленныый пользователь отсутсвует в хранилище");
     }
 }
