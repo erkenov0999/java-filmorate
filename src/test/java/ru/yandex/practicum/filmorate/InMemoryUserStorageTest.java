@@ -2,13 +2,14 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryUserStorageTest {
     private final InMemoryUserStorage userStorage = new InMemoryUserStorage();
@@ -113,5 +114,74 @@ public class InMemoryUserStorageTest {
 
         //Assert
         assertNull(userStorage.getUsers().get(userId), "Удаленныый пользователь отсутсвует в хранилище");
+    }
+
+    @Test
+    @DisplayName("Получение всех пользователей должно возвращать всех добавленных пользователей")
+    void getAllUsers_shouldReturnAllAddedUsers() {
+        // Arrange
+        User user1 = new User("user1@mail.ru", "user1", "User1", LocalDate.of(1990, 1, 1));
+        User user2 = new User("user2@mail.ru", "user2", "User2", LocalDate.of(1990, 1, 1));
+        userStorage.addNewUser(user1);
+        userStorage.addNewUser(user2);
+
+        // Act
+        List<User> allUsers = userStorage.getAllUsers();
+
+        // Assert
+        assertEquals(2, allUsers.size(), "Должны быть возвращены все добавленные пользователи");
+        assertTrue(allUsers.contains(user1) && allUsers.contains(user2),
+                "Возвращенный список должен содержать всех добавленных пользователей");
+    }
+
+    @Test
+    @DisplayName("Получение пользователя по ID должно возвращать корректного пользователя")
+    void getUserById_shouldReturnCorrectUser() {
+        // Arrange
+        User user = new User("user@mail.ru", "user", "User", LocalDate.of(1990, 1, 1));
+        userStorage.addNewUser(user);
+        Long userId = user.getId();
+
+        // Act
+        User foundUser = userStorage.getUserById(userId);
+
+        // Assert
+        assertEquals(user, foundUser, "Найденный пользователь должен соответствовать добавленному");
+    }
+
+    @Test
+    @DisplayName("Получение несуществующего пользователя по ID должно возвращать null")
+    void getNonExistentUserById_shouldReturnNull() {
+        // Act
+        User foundUser = userStorage.getUserById(999L);
+
+        // Assert
+        assertNull(foundUser, "Для несуществующего ID должен возвращаться null");
+    }
+
+    @Test
+    @DisplayName("Обновление несуществующего пользователя должно вызывать исключение")
+    void updateNonExistentUser_shouldThrowException() {
+        // Arrange
+        User user = new User("user@mail.ru", "user", "User", LocalDate.of(1990, 1, 1));
+        user.setId(999L);
+
+        // Act & Assert
+        assertThrows(ResponseStatusException.class,
+                () -> userStorage.updateUser(user),
+                "Должно быть выброшено исключение при попытке обновить несуществующего пользователя");
+    }
+
+    @Test
+    @DisplayName("Удаление несуществующего пользователя должно вызывать исключение")
+    void deleteNonExistentUser_shouldThrowException() {
+        // Arrange
+        User user = new User("user@mail.ru", "user", "User", LocalDate.of(1990, 1, 1));
+        user.setId(999L);
+
+        // Act & Assert
+        assertThrows(ResponseStatusException.class,
+                () -> userStorage.deleteUser(user),
+                "Должно быть выброшено исключение при попытке удалить несуществующего пользователя");
     }
 }
