@@ -10,6 +10,8 @@ import java.util.Set;
 @Data
 public class Film {
     private Long id;
+    private Mpa mpa;
+    private Set<Genre> genres = new HashSet<>();
     private final Set<Long> likes = new HashSet<>();
 
     @NotBlank(message = "Название фильма не может быть пустым!")
@@ -20,7 +22,6 @@ public class Film {
     private String description;
 
     @NotNull(message = "Дата релиза не может быть пустой!")
-
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность фильма должна быть положительной!")
