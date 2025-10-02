@@ -11,7 +11,7 @@ CREATE TABLE films (
     id              INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name            VARCHAR(100)        NOT NULL,
     description     VARCHAR(200)        NOT NULL,
-    releaseDate     DATE                NOT NULL,
+    release_date     DATE                NOT NULL,
     duration        INT                 NOT NULL,
 );
 
