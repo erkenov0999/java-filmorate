@@ -27,3 +27,13 @@ CREATE TABLE IF NOT EXISTS mpa (
     id      INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name    VARCHAR(50)         NOT NULL
 );
+
+
+CREATE TABLE IF NOT EXISTS film_genres (
+    film_id     INT     NOT NULL,
+    genre_id    INT     NOT NULL,
+
+    PRIMARY KEY (film_id, genre_id),
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE
+);
