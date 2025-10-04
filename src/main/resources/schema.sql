@@ -1,3 +1,4 @@
+--Создание таблицы с ПОЛЬЗОВАТЕЛЯМИ
 CREATE TABLE IF NOT EXISTS users (
     id          INT             GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email       VARCHAR(50)     NOT NULL UNIQUE,
@@ -6,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     birthday    DATE
 );
 
-
+--Создание таблицы с ФИЛЬМАМИ
 CREATE TABLE IF NOT EXISTS films (
     id              INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name            VARCHAR(100)        NOT NULL,
@@ -16,19 +17,19 @@ CREATE TABLE IF NOT EXISTS films (
     mpa_id          INT                 REFERENCES mpa(id)
 );
 
-
+--Создание таблицы с ЖАНРАМИ
 CREATE TABLE IF NOT EXISTS genres (
     id      INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name    VARCHAR(50)         NOT NULL
 );
 
-
+--Создание таблицы с ВОЗРАСТНЫМ РЕЙТИНГОМ
 CREATE TABLE IF NOT EXISTS mpa (
     id      INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name    VARCHAR(50)         NOT NULL
 );
 
-
+--Связующая таблица между фильмами и жанрами (связь: многие-ко-многим)
 CREATE TABLE IF NOT EXISTS film_genres (
     film_id     INT     NOT NULL,
     genre_id    INT     NOT NULL,
