@@ -1,3 +1,9 @@
+--Создание таблицы с ВОЗРАСТНЫМ РЕЙТИНГОМ
+CREATE TABLE IF NOT EXISTS mpa (
+    id      INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name    VARCHAR(50)         NOT NULL
+);
+
 --Создание таблицы с ПОЛЬЗОВАТЕЛЯМИ
 CREATE TABLE IF NOT EXISTS users (
     id          INT             GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -19,12 +25,6 @@ CREATE TABLE IF NOT EXISTS films (
 
 --Создание таблицы с ЖАНРАМИ
 CREATE TABLE IF NOT EXISTS genres (
-    id      INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name    VARCHAR(50)         NOT NULL
-);
-
---Создание таблицы с ВОЗРАСТНЫМ РЕЙТИНГОМ
-CREATE TABLE IF NOT EXISTS mpa (
     id      INT                 GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name    VARCHAR(50)         NOT NULL
 );
