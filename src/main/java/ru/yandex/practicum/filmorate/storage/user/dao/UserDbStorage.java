@@ -19,13 +19,16 @@ public class UserDbStorage implements UserStorage {
     JdbcTemplate jdbcTemplate;
 
     private static RowMapper<User> getUserMapper() {
-        return (rs, rowNum) -> new User(
-                rs.getLong("id"),
-                rs.getString("email"),
-                rs.getString("login"),
-                rs.getString("name"),
-                rs.getDate("birthday").toLocalDate()
-        );
+        return (rs, rowNum) -> {
+            User user = new User(
+                    rs.getString("email"),
+                    rs.getString("login"),
+                    rs.getString("name"),
+                    rs.getDate("birthday").toLocalDate()
+            );
+            user.setId(rs.getLong("id"));
+            return user;
+        };
     }
 
     private static Map<String, Object> userToMap(User user) {
