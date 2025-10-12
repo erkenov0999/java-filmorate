@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.dao.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -126,7 +126,7 @@ public class InMemoryUserStorageTest {
         userStorage.addNewUser(user2);
 
         // Act
-        List<User> allUsers = userStorage.getAllUsers();
+        List<User> allUsers = userStorage.findAllUsers();
 
         // Assert
         assertEquals(2, allUsers.size(), "Должны быть возвращены все добавленные пользователи");
@@ -143,7 +143,7 @@ public class InMemoryUserStorageTest {
         Long userId = user.getId();
 
         // Act
-        User foundUser = userStorage.getUserById(userId);
+        User foundUser = userStorage.findUserById(userId);
 
         // Assert
         assertEquals(user, foundUser, "Найденный пользователь должен соответствовать добавленному");
@@ -153,7 +153,7 @@ public class InMemoryUserStorageTest {
     @DisplayName("Получение несуществующего пользователя по ID должно возвращать null")
     void getNonExistentUserById_shouldReturnNull() {
         // Act
-        User foundUser = userStorage.getUserById(999L);
+        User foundUser = userStorage.findUserById(999L);
 
         // Assert
         assertNull(foundUser, "Для несуществующего ID должен возвращаться null");

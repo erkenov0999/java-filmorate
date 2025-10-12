@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.dao.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -15,11 +15,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     private UserService userService;
-    private InMemoryUserStorage userStorage;
+    private UserDbStorage userStorage;
 
     @BeforeEach
     void setUp() {
-        userStorage = new InMemoryUserStorage();
+        //userStorage = new UserDbStorage();
         userService = new UserService(userStorage);
     }
 

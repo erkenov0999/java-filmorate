@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.film.dao.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.dao.InMemoryUserStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -85,7 +85,7 @@ public class FilmService {
     }
 
     private void chekingFilmAndUser(long filmId, long userId) throws ResponseStatusException {
-        if (userStorage.getUserById(userId) == null) {
+        if (userStorage.findUserById(userId) == null) {
             log.error("Не удалось найти пользователя с ID {} ", userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID "
                     + userId);

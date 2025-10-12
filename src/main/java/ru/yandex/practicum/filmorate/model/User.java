@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     private Set<Long> friends = new HashSet<>();
 
@@ -20,7 +22,7 @@ public class User {
     private String email;
 
     @NotBlank(message = "Логин не может быть пустым!")
-    //@Pattern(regexp = "^\\S+$", message = "Пробелы в логине запрещены!")
+    @Pattern(regexp = "^\\S+$", message = "Пробелы в логине запрещены!")
     private String login;
 
     private String name;
@@ -29,8 +31,17 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть позже текущего дня!")
     private LocalDate birthday;
 
-
+    // Конструктор для создания нового пользователя (без ID)
     public User(String email, String login, String name, LocalDate birthday) {
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+    }
+
+    // Конструктор для загрузки из БД (с ID)
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
         this.email = email;
         this.login = login;
         this.name = name;
