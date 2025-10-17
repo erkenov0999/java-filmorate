@@ -1,19 +1,22 @@
 package ru.yandex.practicum.filmorate.storage.user.dao;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Repository
 public class UserDbStorage implements UserStorage {
     JdbcTemplate jdbcTemplate;
@@ -52,8 +55,8 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
-        return null;
+    public User updateUser(User user) throws ResponseStatusException {
+        String request = "UPDATE USERS SET NAME=?, BIRTHDAY=? WHERE ID=?";
     }
 
     @Override
@@ -67,8 +70,14 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User findUserById(long id) {
-        return jdbcTemplate.queryForObject("SELECT * FROM users WHERE id = ?", getUserMapper(), id);
+    public Optional<User> findUserById(long id) throws ResponseStatusException {
+        String request = "SELECT * FROM users WHERE id = ?";
+        try {
+            User user = jdbcTemplate.queryForObject(request, getUserMapper(), id);
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public User checkAndFillName(User user) {
