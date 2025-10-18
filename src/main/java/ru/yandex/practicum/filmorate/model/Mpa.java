@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @AllArgsConstructor
+@Data
 public class Mpa {
     @NotNull(message = "id не может быть пустым")
     private int id;

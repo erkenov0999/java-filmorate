@@ -56,12 +56,40 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) throws ResponseStatusException {
-        String request = "UPDATE USERS SET NAME=?, BIRTHDAY=? WHERE ID=?";
+        String request = "UPDATE users " +
+                        "SET email = ?, " +
+                        "login = ? " +
+                        "name = ? " +
+                        "birthday = ? " +
+                        "WHERE id = ?";
+
+        Map<String, Object> userToUpdate = userToMap(user);
+
+        jdbcTemplate.update(request,
+                userToUpdate.get("email"),
+                userToUpdate.get("login"),
+                userToUpdate.get("name"),
+                userToUpdate.get("birthday"),
+                user.getId()
+        );
+
+        return user;
     }
 
     @Override
     public void deleteUser(User user) {
+        deleteUserById(user.getId());
+    }
 
+    private void deleteUserById(long id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, id);
+
+        if (rowsAffected == 0) {
+            log.warn("Пользователь с id {} не найден для удаления", id);
+        } else {
+            log.info("Пользователь с id {} успешно удален", id);
+        }
     }
 
     @Override
