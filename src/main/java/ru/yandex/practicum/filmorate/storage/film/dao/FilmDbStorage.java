@@ -2,14 +2,18 @@ package ru.yandex.practicum.filmorate.storage.film.dao;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,36 +41,49 @@ public class FilmDbStorage implements FilmStorage {
         };
     }
 
+    private static Map<String, Object> filmToMap(Film film) {
+        return Map.of(
+                "name", film.getName(),
+                "description", film.getDescription(),
+                "release_date", film.getReleaseDate(),
+                "duration", film.getDuration(),
+                "mpa_id", film.getMpa() != null ? film.getMpa().getId() : null
+        );
+    }
+
     @Override
     public Film addNewFilm(Film film) {
-        String sql = "INSERT INTO films (name, description, release_date, duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sql, 
-                film.getName(), 
-                film.getDescription(), 
-                film.getReleaseDate(), 
-                film.getDuration(),
-                film.getMpa().getId());
+        log.info("Добавление нового фильма: {}", film.getName());
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("films")
+                .usingGeneratedKeyColumns("id");
         
-        // Получаем ID созданного фильма
-        String getIdSql = "SELECT id FROM films WHERE name = ? AND description = ? ORDER BY id DESC LIMIT 1";
-        Long filmId = jdbcTemplate.queryForObject(getIdSql, Long.class, film.getName(), film.getDescription());
+        Long filmId = simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).longValue();
         film.setId(filmId);
         
-        return getFilmById(filmId);
+        log.info("Фильм успешно добавлен с ID: {}", filmId);
+        return getFilmById(filmId).orElse(null);
     }
 
     @Override
     public Film updateFilm(Film film) {
+        log.info("Обновление фильма с ID: {}", film.getId());
         String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE id = ?";
-        jdbcTemplate.update(sql, 
+        int rowsAffected = jdbcTemplate.update(sql, 
                 film.getName(), 
                 film.getDescription(), 
                 film.getReleaseDate(), 
                 film.getDuration(),
-                film.getMpa().getId(),
+                film.getMpa() != null ? film.getMpa().getId() : null,
                 film.getId());
         
-        return getFilmById(film.getId());
+        if (rowsAffected == 0) {
+            log.warn("Фильм с ID {} не найден для обновления", film.getId());
+            return null;
+        }
+        
+        log.info("Фильм с ID {} успешно обновлен", film.getId());
+        return getFilmById(film.getId()).orElse(null);
     }
 
     @Override
@@ -87,14 +104,28 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
+        log.info("Получение всех фильмов");
         String sql = "SELECT f.*, m.name as mpa_name FROM films f LEFT JOIN mpa m ON f.mpa_id = m.id";
-        return jdbcTemplate.query(sql, getFilmMapper());
+        List<Film> films = jdbcTemplate.query(sql, getFilmMapper());
+        log.info("Найдено {} фильмов", films.size());
+        return films;
     }
 
     @Override
-    public Film getFilmById(long id) {
+    public Optional<Film> getFilmById(long id) {
+        log.info("Получение фильма с ID: {}", id);
         String sql = "SELECT f.*, m.name as mpa_name FROM films f LEFT JOIN mpa m ON f.mpa_id = m.id WHERE f.id = ?";
-        List<Film> films = jdbcTemplate.query(sql, getFilmMapper(), id);
-        return films.isEmpty() ? null : films.get(0);
+        try {
+            List<Film> films = jdbcTemplate.query(sql, getFilmMapper(), id);
+            if (films.isEmpty()) {
+                log.warn("Фильм с ID {} не найден", id);
+                return Optional.empty();
+            }
+            log.info("Фильм с ID {} найден", id);
+            return Optional.of(films.get(0));
+        } catch (EmptyResultDataAccessException e) {
+            log.warn("Фильм с ID {} не найден", id);
+            return Optional.empty();
+        }
     }
 }

@@ -4,12 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@AllArgsConstructor
 @Data
+@AllArgsConstructor
 public class Mpa {
     @NotNull(message = "id не может быть пустым")
     private int id;
 
     @NotNull(message = "Наименование ограничения не может быть пустым")
-    private String mpaName;
+    private String name;
 }

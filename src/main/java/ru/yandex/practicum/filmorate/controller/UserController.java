@@ -17,14 +17,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    UserDbStorage userStorage;
-    UserService userService;
-
-    @Autowired
-    public UserController(UserDbStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
-        this.userService = userService;
-    }
+    private final UserDbStorage userStorage;
+    private final UserService userService;
 
     @PostMapping
     public User addNewUser(@Valid @RequestBody User user) {
@@ -50,20 +44,26 @@ public class UserController {
         return userStorage.findAllUsers();
     }
 
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable long id) {
+        log.info("Получение пользователя с ID: {}", id);
+        return userStorage.findUserById(id).orElse(null);
+    }
+
     @PutMapping("/{id}/friends/{friendId}")
-    public void addNewFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void addNewFriend(@PathVariable long id, @PathVariable long friendId) {
         log.info("Пользователь {} добавил нового друга", id);
         userService.addNewFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void deleteFriend(@PathVariable int id, @PathVariable int friendId) {
+    public void deleteFriend(@PathVariable long id, @PathVariable long friendId) {
         log.info("Пользователь {} удалил друга", id);
         userService.deleteFromFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public Set<User> getFriends(@PathVariable int id) {
+    public Set<User> getFriends(@PathVariable long id) {
         log.info("Список друзей пользователя с ID {}", id);
         return userService.getFriends(id);
     }

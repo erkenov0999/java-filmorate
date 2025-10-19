@@ -1,36 +1,61 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FilmService {
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
     private List<Film> topFilms = new ArrayList<>();
 
-    private final InMemoryFilmStorage filmStorage;
-    private final InMemoryUserStorage userStorage;
-
-
-    @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage, InMemoryUserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
+    public Film addNewFilm(Film film) {
+        log.info("Добавление нового фильма: {}", film.getName());
+        return filmStorage.addNewFilm(film);
     }
 
+    public Film updateFilm(Film film) {
+        log.info("Обновление фильма с ID: {}", film.getId());
+        return filmStorage.updateFilm(film);
+    }
+
+    public void deleteFilm(Film film) {
+        log.info("Удаление фильма с ID: {}", film.getId());
+        filmStorage.deleteFilm(film);
+    }
+
+    public List<Film> getAllFilms() {
+        log.info("Получение всех фильмов");
+        return filmStorage.getAllFilms();
+    }
+
+    public Optional<Film> getFilmById(long id) {
+        log.info("Получение фильма с ID: {}", id);
+        return filmStorage.getFilmById(id);
+    }
 
     public void putLike(long idFilm, long idUser) throws ResponseStatusException {
-        chekingFilmAndUser(idFilm, idUser);
+        checkingFilmAndUser(idFilm, idUser);
 
-        Film film = filmStorage.getFilmById(idFilm);
+        Optional<Film> filmOpt = filmStorage.getFilmById(idFilm);
+        if (filmOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
+        }
+        
+        Film film = filmOpt.get();
 
         if(film.getLikes().contains(idUser)) {
             log.error("Попытка повторно поставить лайк фильму");
@@ -44,9 +69,14 @@ public class FilmService {
     }
 
     public void removeLike(long idFilm, long idUser) throws ResponseStatusException {
-        chekingFilmAndUser(idFilm, idUser);
+        checkingFilmAndUser(idFilm, idUser);
 
-        Film film = filmStorage.getFilmById(idFilm);
+        Optional<Film> filmOpt = filmStorage.getFilmById(idFilm);
+        if (filmOpt.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
+        }
+        
+        Film film = filmOpt.get();
 
         if (!film.getLikes().contains(idUser)) {
             log.error("Попытка убрать не существующий лайк");
@@ -73,23 +103,23 @@ public class FilmService {
 
     public List<Film> getTopFilms(int limit) {
         List<Film> films = new ArrayList<>(topFilms);
-        List<Film> topFilms = new ArrayList<>();
+        List<Film> resultFilms = new ArrayList<>();
         long listSize = films.size();
 
         for (int i = 0; i < limit && i < listSize; i++) {
-            topFilms.add(films.get(i));
+            resultFilms.add(films.get(i));
         }
-        return topFilms;
+        return resultFilms;
     }
 
-    private void chekingFilmAndUser(long filmId, long userId) throws ResponseStatusException {
-        if (userStorage.findUserById(userId) == null) {
+    private void checkingFilmAndUser(long filmId, long userId) throws ResponseStatusException {
+        if (userStorage.findUserById(userId).isEmpty()) {
             log.error("Не удалось найти пользователя с ID {} ", userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID "
                     + userId);
         }
 
-        if (filmStorage.getFilmById(filmId) == null) {
+        if (filmStorage.getFilmById(filmId).isEmpty()) {
             log.error("Не удалось найти фильм с ID {} ", filmId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти фильм с ID " + filmId);
         }

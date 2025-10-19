@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
@@ -19,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Repository
 public class UserDbStorage implements UserStorage {
-    JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     private static RowMapper<User> getUserMapper() {
         return (rs, rowNum) -> {
@@ -45,33 +44,42 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addNewUser(User user) {
+        log.info("Добавление нового пользователя: {}", user.getLogin());
         User checkUser = checkAndFillName(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).
-                withTableName("USERS").
-                usingGeneratedKeyColumns("ID");
+                withTableName("users").
+                usingGeneratedKeyColumns("id");
         Long id = simpleJdbcInsert.executeAndReturnKey(userToMap(checkUser)).longValue();
         checkUser.setId(id);
+        log.info("Пользователь успешно добавлен с ID: {}", id);
         return checkUser;
     }
 
     @Override
-    public User updateUser(User user) throws ResponseStatusException {
-        String request = "UPDATE USERS " +
+    public User updateUser(User user) {
+        log.info("Обновление пользователя с ID: {}", user.getId());
+        String request = "UPDATE users " +
                         "SET email = ?, " +
-                        "login = ? " +
-                        "name = ? " +
+                        "login = ?, " +
+                        "name = ?, " +
                         "birthday = ? " +
                         "WHERE id = ?";
 
         Map<String, Object> userToUpdate = userToMap(user);
 
-        jdbcTemplate.update(request,
+        int rowsAffected = jdbcTemplate.update(request,
                 userToUpdate.get("email"),
                 userToUpdate.get("login"),
                 userToUpdate.get("name"),
                 userToUpdate.get("birthday"),
                 user.getId()
         );
+
+        if (rowsAffected == 0) {
+            log.warn("Пользователь с ID {} не найден для обновления", user.getId());
+        } else {
+            log.info("Пользователь с ID {} успешно обновлен", user.getId());
+        }
 
         return user;
     }
@@ -82,7 +90,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     private void deleteUserById(long id) {
-        String sql = "DELETE FROM USERS WHERE id = ?";
+        String sql = "DELETE FROM users WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
 
         if (rowsAffected == 0) {
@@ -94,16 +102,22 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> findAllUsers() {
-        return jdbcTemplate.query("SELECT * FROM USERS", getUserMapper());
+        log.info("Получение всех пользователей");
+        List<User> users = jdbcTemplate.query("SELECT * FROM users", getUserMapper());
+        log.info("Найдено {} пользователей", users.size());
+        return users;
     }
 
     @Override
-    public Optional<User> findUserById(long id) throws ResponseStatusException {
-        String request = "SELECT * FROM USERS WHERE id = ?";
+    public Optional<User> findUserById(long id) {
+        log.info("Получение пользователя с ID: {}", id);
+        String request = "SELECT * FROM users WHERE id = ?";
         try {
             User user = jdbcTemplate.queryForObject(request, getUserMapper(), id);
+            log.info("Пользователь с ID {} найден", id);
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException e) {
+            log.warn("Пользователь с ID {} не найден", id);
             return Optional.empty();
         }
     }

@@ -38,3 +38,21 @@ CREATE TABLE IF NOT EXISTS film_genres (
     FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
     FOREIGN KEY (genre_id) REFERENCES genres(id) ON DELETE CASCADE
 );
+
+--Связующая таблица между фильмами и лайками пользователей
+CREATE TABLE IF NOT EXISTS film_likes (
+    film_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY (film_id, user_id),
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+--Связующая таблица между пользователями и друзьями (связь: многие-ко-многим)
+CREATE TABLE IF NOT EXISTS user_friends (
+    user_id INT NOT NULL,
+    friend_id INT NOT NULL,
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+);
