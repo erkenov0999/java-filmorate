@@ -47,8 +47,8 @@ public class UserDbStorage implements UserStorage {
     public User addNewUser(User user) {
         User checkUser = checkAndFillName(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).
-                withTableName("users").
-                usingGeneratedKeyColumns("id");
+                withTableName("USERS").
+                usingGeneratedKeyColumns("ID");
         Long id = simpleJdbcInsert.executeAndReturnKey(userToMap(checkUser)).longValue();
         checkUser.setId(id);
         return checkUser;
@@ -56,7 +56,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) throws ResponseStatusException {
-        String request = "UPDATE users " +
+        String request = "UPDATE USERS " +
                         "SET email = ?, " +
                         "login = ? " +
                         "name = ? " +
@@ -82,7 +82,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     private void deleteUserById(long id) {
-        String sql = "DELETE FROM users WHERE id = ?";
+        String sql = "DELETE FROM USERS WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
 
         if (rowsAffected == 0) {
@@ -94,12 +94,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> findAllUsers() {
-        return jdbcTemplate.query("SELECT * FROM users", getUserMapper());
+        return jdbcTemplate.query("SELECT * FROM USERS", getUserMapper());
     }
 
     @Override
     public Optional<User> findUserById(long id) throws ResponseStatusException {
-        String request = "SELECT * FROM users WHERE id = ?";
+        String request = "SELECT * FROM USERS WHERE id = ?";
         try {
             User user = jdbcTemplate.queryForObject(request, getUserMapper(), id);
             return Optional.ofNullable(user);
