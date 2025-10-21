@@ -17,9 +17,32 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
     private final UserDbStorage userStorage;
+    private final FriendsService friendsService;
 
+    public User addNewUser(User newUser) {
+        checkAndFillName(newUser);
+        return userStorage.addNewUser(newUser);
+    }
 
-    public void addNewFriend(long userId, long friendId) throws ResponseStatusException {
+    public User updateUser(User user) {
+        Long userId = user.getId();
+        boolean userExist = userStorage.isUserExists(userId);
+        if (!userExist) {
+            log.info("Пользователь для обновления с ID {} не найден!", userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Пользователь для обновления не найден ID = " + userId);
+        }
+
+        checkAndFillName(user);
+        User updatedUser = userStorage.updateUser(user);
+
+        Set<Long> friends = user.getFriends();
+        removeAllFriends(userId, friends);
+        addFriends(userId, friends);
+        return updatedUser;
+    }
+
+    public void addFriend(long userId, long friendId) throws ResponseStatusException {
         checkingBeforeAddingFriends(userId, friendId);
 
         Optional<User> userOpt = userStorage.findUserById(userId);
@@ -41,7 +64,13 @@ public class UserService {
         log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, userId);
     }
 
-    public void deleteFromFriends(long id, long friendId) throws ResponseStatusException {
+    public void addFriends(long userId, Set<Long> friendIds) throws ResponseStatusException {
+        for (Long friendId : friendIds) {
+            addFriend(userId, friendId);
+        }
+    }
+
+    public void removeFriend(long id, long friendId) throws ResponseStatusException {
         checkingBeforeAddingFriends(id, friendId);
 
         Optional<User> userOpt = userStorage.findUserById(id);
@@ -61,6 +90,12 @@ public class UserService {
         userStorage.updateUser(friend);
 
         log.info("Пользователь {} удалил из друзей {}", friendId, user.getId());
+    }
+
+    public void removeAllFriends(long userId, Set<Long> friendIds) throws ResponseStatusException {
+        for (Long friendId : friendIds) {
+            removeFriend(userId, friendId);
+        }
     }
 
     public Set<User> getFriends(long userId) throws ResponseStatusException {
@@ -124,5 +159,13 @@ public class UserService {
             log.error("Запрещено добавлять в друзья или удалять самого себя {}", friendId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Запрещено выполнять это действие с самим собой.");
         }
+    }
+
+    public User checkAndFillName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+            return user;
+        }
+        return user;
     }
 }

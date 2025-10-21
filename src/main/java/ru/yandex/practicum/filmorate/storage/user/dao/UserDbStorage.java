@@ -45,14 +45,13 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User addNewUser(User user) {
         log.info("Добавление нового пользователя: {}", user.getLogin());
-        User checkUser = checkAndFillName(user);
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).
                 withTableName("users").
                 usingGeneratedKeyColumns("id");
-        Long id = simpleJdbcInsert.executeAndReturnKey(userToMap(checkUser)).longValue();
-        checkUser.setId(id);
+        Long id = simpleJdbcInsert.executeAndReturnKey(userToMap(user)).longValue();
+        user.setId(id);
         log.info("Пользователь успешно добавлен с ID: {}", id);
-        return checkUser;
+        return user;
     }
 
     @Override
@@ -122,11 +121,8 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    public User checkAndFillName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-            return user;
-        }
-        return user;
+    public boolean isUserExists(Long userId) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM users WHERE id = ?)";
+        return jdbcTemplate.queryForObject(sql, Boolean.class, userId);
     }
 }
