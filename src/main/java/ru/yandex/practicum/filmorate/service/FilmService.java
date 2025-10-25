@@ -54,7 +54,6 @@ public class FilmService {
         if (filmOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
         }
-        
         Film film = filmOpt.get();
 
         if(film.getLikes().contains(idUser)) {
@@ -75,7 +74,6 @@ public class FilmService {
         if (filmOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
         }
-        
         Film film = filmOpt.get();
 
         if (!film.getLikes().contains(idUser)) {
