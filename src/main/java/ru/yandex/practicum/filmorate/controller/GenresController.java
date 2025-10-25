@@ -31,5 +31,3 @@ public class GenresController {
                         "Жанр с ID " + id + " не найден"));
     }
 }
-
-

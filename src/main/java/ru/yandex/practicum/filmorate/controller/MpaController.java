@@ -31,5 +31,3 @@ public class MpaController {
                         "MPA рейтинг с ID " + id + " не найден"));
     }
 }
-
-
