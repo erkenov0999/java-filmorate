@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.dao.UserDbStorage;
 
 import java.util.List;
 import java.util.Set;
@@ -16,37 +15,36 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserDbStorage userStorage;
     private final UserService userService;
 
     @PostMapping
     public User addNewUser(@Valid @RequestBody User user) {
         log.info("Создание нового пользователя: {}", user);
-        return userStorage.addNewUser(user);
+        return userService.addNewUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
         log.info("Обновление данных пользователя: {}", user);
-        return userStorage.updateUser(user);
+        return userService.updateUser(user);
     }
 
     @DeleteMapping
     public void deleteUser(@Valid @RequestBody User user) {
         log.info("Удаление пользователя: {}", user);
-        userStorage.deleteUser(user);
+        userService.deleteUser(user);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
         log.info("Получения списка всех пользователей");
-        return userStorage.findAllUsers();
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable long id) {
         log.info("Получение пользователя с ID: {}", id);
-        return userStorage.findUserById(id).orElse(null);
+        return userService.getUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

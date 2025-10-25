@@ -6,9 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserDbStorage userStorage;
+    private final UserStorage userStorage;
     private final FriendsService friendsService;
 
     public User addNewUser(User newUser) {
@@ -159,6 +160,21 @@ public class UserService {
             log.error("Запрещено добавлять в друзья или удалять самого себя {}", friendId);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Запрещено выполнять это действие с самим собой.");
         }
+    }
+
+    public void deleteUser(User user) {
+        log.info("Удаление пользователя с ID: {}", user.getId());
+        userStorage.deleteUser(user);
+    }
+
+    public List<User> getAllUsers() {
+        log.info("Получение всех пользователей");
+        return userStorage.findAllUsers();
+    }
+
+    public User getUserById(long id) {
+        log.info("Получение пользователя с ID: {}", id);
+        return userStorage.findUserById(id).orElse(null);
     }
 
     public User checkAndFillName(User user) {

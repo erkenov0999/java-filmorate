@@ -11,4 +11,5 @@ public interface UserStorage {
     void deleteUser(User user);
     List<User> findAllUsers();
     Optional<User> findUserById(long id);
+    boolean isUserExists(Long userId);
 }
