@@ -79,7 +79,6 @@ public class UserService {
         User friend = friendOpt.get();
         user.getFriends().remove(friendId);
         friend.getFriends().remove(user.getId());
-        
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
         log.info("Пользователь {} удалил из друзей {}", friendId, user.getId());
@@ -100,7 +99,6 @@ public class UserService {
 
         User user = userOpt.get();
         Set<User> friends = new HashSet<>();
-        
         for (long friendId : user.getFriends()) {
             Optional<User> friendOpt = userStorage.findUserById(friendId);
             friendOpt.ifPresent(friends::add);
@@ -128,7 +126,6 @@ public class UserService {
             Optional<User> friendOpt = userStorage.findUserById(friendId);
             friendOpt.ifPresent(friends::add);
         }
-        
         log.info("Вывод списка общих друзей между пользователям {} и пользователем {}", firstUserId, secondUserId);
         return friends;
     }
