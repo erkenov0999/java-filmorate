@@ -111,11 +111,9 @@ public class UserService {
 
         Optional<User> firstUserOpt = userStorage.findUserById(firstUserId);
         Optional<User> secondUserOpt = userStorage.findUserById(secondUserId);
-        
         if (firstUserOpt.isEmpty() || secondUserOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
-        
         User firstUser = firstUserOpt.get();
         User secondUser = secondUserOpt.get();
         Set<Long> commonFriends = new HashSet<>(secondUser.getFriends());
