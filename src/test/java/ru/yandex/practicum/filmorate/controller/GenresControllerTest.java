@@ -6,8 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenresService;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest

@@ -6,8 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
