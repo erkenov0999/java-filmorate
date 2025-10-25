@@ -63,9 +63,7 @@ public class UserDbStorage implements UserStorage {
                         "name = ?, " +
                         "birthday = ? " +
                         "WHERE id = ?";
-
         Map<String, Object> userToUpdate = userToMap(user);
-
         int rowsAffected = jdbcTemplate.update(request,
                 userToUpdate.get("email"),
                 userToUpdate.get("login"),
@@ -73,13 +71,11 @@ public class UserDbStorage implements UserStorage {
                 userToUpdate.get("birthday"),
                 user.getId()
         );
-
         if (rowsAffected == 0) {
             log.warn("Пользователь с ID {} не найден для обновления", user.getId());
         } else {
             log.info("Пользователь с ID {} успешно обновлен", user.getId());
         }
-
         return user;
     }
 
@@ -87,7 +83,6 @@ public class UserDbStorage implements UserStorage {
     public void deleteUser(User user) {
         deleteUserById(user.getId());
     }
-
     private void deleteUserById(long id) {
         String sql = "DELETE FROM users WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);

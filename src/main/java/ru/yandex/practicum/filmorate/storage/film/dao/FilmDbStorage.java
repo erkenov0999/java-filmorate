@@ -30,13 +30,11 @@ public class FilmDbStorage implements FilmStorage {
                     rs.getLong("duration")
             );
             film.setId(rs.getLong("id"));
-            
             // Создаем объект MPA из данных в ResultSet
             int mpaId = rs.getInt("mpa_id");
             String mpaName = rs.getString("mpa_name");
             Mpa mpa = new Mpa(mpaId, mpaName);
             film.setMpa(mpa);
-            
             return film;
         };
     }
@@ -57,10 +55,8 @@ public class FilmDbStorage implements FilmStorage {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
-        
         Long filmId = simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).longValue();
         film.setId(filmId);
-        
         log.info("Фильм успешно добавлен с ID: {}", filmId);
         return getFilmById(filmId).orElse(null);
     }
@@ -76,12 +72,10 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getMpa() != null ? film.getMpa().getId() : null,
                 film.getId());
-        
         if (rowsAffected == 0) {
             log.warn("Фильм с ID {} не найден для обновления", film.getId());
             return null;
         }
-        
         log.info("Фильм с ID {} успешно обновлен", film.getId());
         return getFilmById(film.getId()).orElse(null);
     }
@@ -94,7 +88,6 @@ public class FilmDbStorage implements FilmStorage {
     private void deleteFilmById(long id) {
         String sql = "DELETE FROM films WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
-
         if (rowsAffected == 0) {
             log.warn("Фильм с id {} не найден для удаления", id);
         } else {

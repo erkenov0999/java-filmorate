@@ -25,8 +25,6 @@ public class GenresDbStorage implements GenresStorage {
         );
     }
 
-
-
     @Override
     public List<Genre> findAllGenres() {
         log.info("Получение всех жанров");

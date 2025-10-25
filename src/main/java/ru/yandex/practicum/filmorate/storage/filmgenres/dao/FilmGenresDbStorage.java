@@ -40,7 +40,6 @@ public class FilmGenresDbStorage implements FilmGenresStorage {
                      "FROM film_genres " +
                      "JOIN genres ON film_genres.genre_id = genres.id " +
                      "WHERE film_genres.film_id = ?";
-
         List<Genre> genres = jdbcTemplate.query(sql, genreRowMapper(), filmId);
         log.info("Найдено {} жанров для фильма {}", genres.size(), filmId);
         return genres;
