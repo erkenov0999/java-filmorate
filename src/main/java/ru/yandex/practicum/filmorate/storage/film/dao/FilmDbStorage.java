@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,9 @@ import java.util.Optional;
 @Repository
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final FilmGenresStorage filmGenresStorage;
 
-    private static RowMapper<Film> getFilmMapper() {
+    private RowMapper<Film> getFilmMapper() {
         return (rs, rowNum) -> {
             Film film = new Film(
                     rs.getString("name"),
@@ -35,6 +37,10 @@ public class FilmDbStorage implements FilmStorage {
             String mpaName = rs.getString("mpa_name");
             Mpa mpa = new Mpa(mpaId, mpaName);
             film.setMpa(mpa);
+            
+            // Загружаем жанры для фильма
+            film.getGenres().addAll(filmGenresStorage.getGenresByFilmId(film.getId()));
+            
             return film;
         };
     }

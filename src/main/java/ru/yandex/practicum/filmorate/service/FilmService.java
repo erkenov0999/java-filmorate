@@ -78,7 +78,7 @@ public class FilmService {
 
         if (!film.getLikes().contains(idUser)) {
             log.error("Попытка убрать не существующий лайк");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Убрать лайк нельзя, так как пользователь c id " + idUser
                             + " не ставил лайк на фильм с id " + film.getId());
         }
@@ -100,6 +100,9 @@ public class FilmService {
     }
 
     public List<Film> getTopFilms(int limit) {
+        if (topFilms.isEmpty()) {
+            updateAndSortFilms(null);
+        }
         List<Film> films = new ArrayList<>(topFilms);
         List<Film> resultFilms = new ArrayList<>();
         long listSize = films.size();
