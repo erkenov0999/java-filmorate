@@ -56,6 +56,8 @@ public class UserService {
 
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
+        // Сохраняем дружбу в базе данных
+        friendsService.addFriend(userId, friendId);
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
         log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, userId);
@@ -79,6 +81,8 @@ public class UserService {
         User friend = friendOpt.get();
         user.getFriends().remove(friendId);
         friend.getFriends().remove(user.getId());
+        // Удаляем дружбу из базы данных
+        friendsService.removeFriend(id, friendId);
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
         log.info("Пользователь {} удалил из друзей {}", friendId, user.getId());
@@ -118,7 +122,6 @@ public class UserService {
         User secondUser = secondUserOpt.get();
         Set<Long> commonFriends = new HashSet<>(secondUser.getFriends());
         commonFriends.retainAll(firstUser.getFriends());
-
         Set<User> friends = new HashSet<>();
         for (long friendId : commonFriends) {
             Optional<User> friendOpt = userStorage.findUserById(friendId);

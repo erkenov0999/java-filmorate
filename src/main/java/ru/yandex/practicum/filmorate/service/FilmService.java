@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
+import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,16 +21,35 @@ import java.util.Optional;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final FilmGenresStorage filmGenresStorage;
     private List<Film> topFilms = new ArrayList<>();
 
     public Film addNewFilm(Film film) {
         log.info("Добавление нового фильма: {}", film.getName());
-        return filmStorage.addNewFilm(film);
+        Film savedFilm = filmStorage.addNewFilm(film);
+        // Сохраняем жанры фильма
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            filmGenresStorage.deleteFilmGenresByFilmId(savedFilm.getId());
+            film.getGenres().forEach(genre -> 
+                filmGenresStorage.addFilmGenre(savedFilm.getId(), genre.getId())
+            );
+        }
+        
+        return savedFilm;
     }
 
     public Film updateFilm(Film film) {
         log.info("Обновление фильма с ID: {}", film.getId());
-        return filmStorage.updateFilm(film);
+        Film updatedFilm = filmStorage.updateFilm(film);
+        // Обновляем жанры фильма
+        if (film.getGenres() != null) {
+            filmGenresStorage.deleteFilmGenresByFilmId(film.getId());
+            film.getGenres().forEach(genre -> 
+                filmGenresStorage.addFilmGenre(film.getId(), genre.getId())
+            );
+        }
+        
+        return updatedFilm;
     }
 
     public void deleteFilm(Film film) {
@@ -78,7 +98,7 @@ public class FilmService {
 
         if (!film.getLikes().contains(idUser)) {
             log.error("Попытка убрать не существующий лайк");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Убрать лайк нельзя, так как пользователь c id " + idUser
                             + " не ставил лайк на фильм с id " + film.getId());
         }
@@ -100,10 +120,12 @@ public class FilmService {
     }
 
     public List<Film> getTopFilms(int limit) {
-        if (topFilms.isEmpty()) {
-            updateAndSortFilms(null);
+        List<Film> films = new ArrayList<>(filmStorage.getAllFilms());
+        if (films.isEmpty()) {
+            return films;
         }
-        List<Film> films = new ArrayList<>(topFilms);
+
+        films.sort(Comparator.comparingInt((Film movie) -> movie.getLikes().size()).reversed());
         List<Film> resultFilms = new ArrayList<>();
         long listSize = films.size();
 

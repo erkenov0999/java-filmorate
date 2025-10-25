@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -44,7 +46,8 @@ public class FilmController {
     public Film getFilmById(@PathVariable long id) {
         log.info("Получение фильма с ID: {}", id);
         return filmService.getFilmById(id)
-                .orElse(null);
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+                        "Фильм с ID " + id + " не найден"));
     }
 
     @PutMapping("/{id}/like/{userId}")

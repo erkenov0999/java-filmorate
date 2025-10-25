@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.validation.FilmReleaseDate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.Set;
 @Data
 public class Film {
     private Long id;
+    @NotNull(message = "MPA рейтинг не может быть пустым!")
     private Mpa mpa;
     private Set<Genre> genres = new HashSet<>();
     private final Set<Long> likes = new HashSet<>();
@@ -22,6 +24,7 @@ public class Film {
     private String description;
 
     @NotNull(message = "Дата релиза не может быть пустой!")
+    @FilmReleaseDate
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность фильма должна быть положительной!")

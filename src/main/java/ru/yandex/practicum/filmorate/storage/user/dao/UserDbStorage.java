@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
+import ru.yandex.practicum.filmorate.storage.friends.interfaces.FriendsStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,9 @@ import java.util.Optional;
 @Repository
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final FriendsStorage friendsStorage;
 
-    private static RowMapper<User> getUserMapper() {
+    private RowMapper<User> getUserMapper() {
         return (rs, rowNum) -> {
             User user = new User(
                     rs.getString("email"),
@@ -29,6 +31,8 @@ public class UserDbStorage implements UserStorage {
                     rs.getDate("birthday").toLocalDate()
             );
             user.setId(rs.getLong("id"));
+            // Загружаем друзей для пользователя
+            user.getFriends().addAll(friendsStorage.getFriendsIdByUserId(user.getId()));
             return user;
         };
     }
@@ -88,7 +92,6 @@ public class UserDbStorage implements UserStorage {
     private void deleteUserById(long id) {
         String sql = "DELETE FROM users WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
-
         if (rowsAffected == 0) {
             log.warn("Пользователь с id {} не найден для удаления", id);
         } else {
