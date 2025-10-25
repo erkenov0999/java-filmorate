@@ -56,7 +56,7 @@ public class FilmService {
         }
         Film film = filmOpt.get();
 
-        if(film.getLikes().contains(idUser)) {
+        if (film.getLikes().contains(idUser)) {
             log.error("Попытка повторно поставить лайк фильму");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Пользователь с ID " + idUser + " уже поставил лайк данному фильму.");
