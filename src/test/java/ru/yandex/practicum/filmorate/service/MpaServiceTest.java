@@ -3,11 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.mpa.dao.MpaDbStorage;
 
-import java.util.List;
-import java.util.Optional;
+import ru.yandex.practicum.filmorate.storage.mpa.dao.MpaDbStorage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
