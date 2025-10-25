@@ -29,7 +29,6 @@ class UserServiceTest {
 
         testUser = new User("test@email.com", "testLogin", "Test User", LocalDate.of(1990, 1, 1));
         testUser.setId(1L);
-        
         testFriend = new User("friend@email.com", "friendLogin", "Friend User", LocalDate.of(1992, 1, 1));
         testFriend.setId(2L);
     }
