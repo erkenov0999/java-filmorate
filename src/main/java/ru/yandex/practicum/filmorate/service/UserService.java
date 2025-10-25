@@ -56,7 +56,6 @@ public class UserService {
 
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
-        
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
         log.info("Пользователи {} и {} добавили друг друга в друзья", friendId, userId);
@@ -73,7 +72,6 @@ public class UserService {
 
         Optional<User> userOpt = userStorage.findUserById(id);
         Optional<User> friendOpt = userStorage.findUserById(friendId);
-        
         if (userOpt.isEmpty() || friendOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден");
         }
@@ -84,7 +82,6 @@ public class UserService {
         
         userStorage.updateUser(user);
         userStorage.updateUser(friend);
-
         log.info("Пользователь {} удалил из друзей {}", friendId, user.getId());
     }
 
