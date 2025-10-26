@@ -149,7 +149,7 @@ public class FilmService {
         films.sort(Comparator.comparingInt((Film movie) -> movie.getLikes().size()).reversed());
         List<Film> resultFilms = new ArrayList<>();
         long listSize = films.size();
-        for (int i = 0; i < limit && i < listSize; i++) {
+        for (int i = 0; i < limit+1 && i < listSize; i++) {
             resultFilms.add(films.get(i));
         }
         return resultFilms;
