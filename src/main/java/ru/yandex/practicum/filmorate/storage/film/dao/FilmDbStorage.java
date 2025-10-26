@@ -56,9 +56,9 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film addNewFilm(Film film) {
         log.info("Добавление нового фильма: {}", film.getName());
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).
-                withTableName("films").
-                usingGeneratedKeyColumns("id");
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("films")
+                .usingGeneratedKeyColumns("id");
         Long filmId = simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).longValue();
         film.setId(filmId);
         log.info("Фильм успешно добавлен с ID: {}", filmId);
