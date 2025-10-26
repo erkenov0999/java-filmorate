@@ -125,12 +125,7 @@ public class FilmService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
         }
         Film film = filmOpt.get();
-        if (!film.getLikes().contains(idUser)) {
-            log.error("Попытка убрать не существующий лайк");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Убрать лайк нельзя, так как пользователь c id " + idUser
-                            + " не ставил лайк на фильм с id " + film.getId());
-        }
+        // Удаляем лайк, даже если его не было
         film.getLikes().remove(idUser);
         updateAndSortFilms();
         log.info("Пользователь {} убрал лайк с фильма с id {}", idUser, film.getId());

@@ -7,13 +7,14 @@ import ru.yandex.practicum.filmorate.validation.FilmReleaseDate;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Data
 public class Film {
     private Long id;
     @NotNull(message = "MPA рейтинг не может быть пустым!")
     private Mpa mpa;
-    private Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres = new TreeSet<>();
     private final Set<Long> likes = new HashSet<>();
 
     @NotBlank(message = "Название фильма не может быть пустым!")
