@@ -130,8 +130,7 @@ public class FilmService {
     private void checkingFilmAndUser(long filmId, long userId) throws ResponseStatusException {
         if (userStorage.findUserById(userId).isEmpty()) {
             log.error("Не удалось найти пользователя с ID {} ", userId);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID "
-                    + userId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Не удалось найти пользователя с ID " + userId);
         }
 
         if (filmStorage.getFilmById(filmId).isEmpty()) {
