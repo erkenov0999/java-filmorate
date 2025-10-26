@@ -6,6 +6,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
+import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
 
 import java.time.LocalDate;
 
@@ -20,7 +23,10 @@ class FilmControllerTest {
     @BeforeEach
     void setUp() {
         // Arrange
-        filmService = new FilmService(null, null); // В реальном тесте будут зависимости
+        FilmStorage filmStorage = null;
+        UserStorage userStorage = null;
+        FilmGenresStorage filmGenresStorage = null;
+        filmService = new FilmService(filmStorage, userStorage, filmGenresStorage);
         filmController = new FilmController(filmService);
     }
 
