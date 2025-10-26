@@ -9,6 +9,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.interfaces.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.genres.interfaces.GenresStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -22,10 +24,24 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final FilmGenresStorage filmGenresStorage;
+    private final MpaStorage mpaStorage;
+    private final GenresStorage genresStorage;
     private List<Film> topFilms = new ArrayList<>();
 
     public Film addNewFilm(Film film) {
         log.info("Добавление нового фильма: {}", film.getName());
+        // Валидируем MPA
+        if (film.getMpa() != null && mpaStorage.findById(film.getMpa().getId()).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "MPA рейтинг с ID " + film.getMpa().getId() + " не найден");
+        }
+        // Валидируем жанры
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (var genre : film.getGenres()) {
+                if (genresStorage.findById(genre.getId()).isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Жанр с ID " + genre.getId() + " не найден");
+                }
+            }
+        }
         Film savedFilm = filmStorage.addNewFilm(film);
         // Сохраняем жанры фильма
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
@@ -34,12 +50,30 @@ public class FilmService {
                     filmGenresStorage.addFilmGenre(savedFilm.getId(), genre.getId())
             );
         }
-        return savedFilm;
+        // Возвращаем фильм с загруженными жанрами из БД
+        return filmStorage.getFilmById(savedFilm.getId()).orElse(savedFilm);
     }
 
     public Film updateFilm(Film film) {
         log.info("Обновление фильма с ID: {}", film.getId());
+        // Валидируем MPA
+        if (film.getMpa() != null && mpaStorage.findById(film.getMpa().getId()).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "MPA рейтинг с ID " + film.getMpa().getId() + " не найден");
+        }
+        // Валидируем жанры
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (var genre : film.getGenres()) {
+                if (genresStorage.findById(genre.getId()).isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Жанр с ID " + genre.getId() + " не найден");
+                }
+            }
+        }
         Film updatedFilm = filmStorage.updateFilm(film);
+        // Проверяем, был ли фильм найден
+        if (updatedFilm == null) {
+            log.error("Фильм с ID {} не найден для обновления", film.getId());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм с ID " + film.getId() + " не найден");
+        }
         // Обновляем жанры фильма
         if (film.getGenres() != null) {
             filmGenresStorage.deleteFilmGenresByFilmId(film.getId());
@@ -47,7 +81,8 @@ public class FilmService {
                     filmGenresStorage.addFilmGenre(film.getId(), genre.getId())
             );
         }
-        return updatedFilm;
+        // Возвращаем фильм с загруженными жанрами из БД
+        return filmStorage.getFilmById(film.getId()).orElse(updatedFilm);
     }
 
     public void deleteFilm(Film film) {
@@ -106,7 +141,6 @@ public class FilmService {
         if (films.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Список фильмов пока еще пуст");
         }
-
         films.sort(Comparator.comparingInt((Film movie) -> movie.getLikes().size()).reversed());
         topFilms = films;
         log.info("Произошли обновления в топе фильмов");
@@ -117,7 +151,6 @@ public class FilmService {
         if (films.isEmpty()) {
             return films;
         }
-
         films.sort(Comparator.comparingInt((Film movie) -> movie.getLikes().size()).reversed());
         List<Film> resultFilms = new ArrayList<>();
         long listSize = films.size();
