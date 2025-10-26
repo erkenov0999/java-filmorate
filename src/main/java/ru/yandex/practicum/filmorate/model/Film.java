@@ -1,12 +1,40 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import ru.yandex.practicum.filmorate.validation.FilmReleaseDate;
 
-/**
- * Film.
- */
-@Getter
-@Setter
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+@Data
 public class Film {
+    private Long id;
+    @NotNull(message = "MPA рейтинг не может быть пустым!")
+    private Mpa mpa;
+    private Set<Genre> genres = new TreeSet<>();
+    private final Set<Long> likes = new HashSet<>();
+
+    @NotBlank(message = "Название фильма не может быть пустым!")
+    private String name;
+
+    @NotBlank(message = "Описание фильма не может быть пустым!")
+    @Size(max = 200, message = "Максимальный объем описания фильма должен составлять не более 200 символов!")
+    private String description;
+
+    @NotNull(message = "Дата релиза не может быть пустой!")
+    @FilmReleaseDate
+    private LocalDate releaseDate;
+
+    @Positive(message = "Продолжительность фильма должна быть положительной!")
+    private long duration;
+
+    public Film(String name, String description, LocalDate releaseDate, long duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 }
