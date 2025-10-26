@@ -142,17 +142,21 @@ public class FilmService {
     }
 
     public List<Film> getTopFilms(int limit) {
-        List<Film> films = new ArrayList<>(filmStorage.getAllFilms());
-        if (films.isEmpty()) {
-            return films;
+        List<Film> listTopPopularFilms = new ArrayList<>();
+        List<Film> allFilms = getFilmsSortedByPopularity();
+        for (int i = 0; i < limit && i < allFilms.size(); i++) {
+            listTopPopularFilms.add(allFilms.get(i));
         }
-        films.sort(Comparator.comparingInt((Film movie) -> movie.getLikes().size()).reversed());
-        List<Film> resultFilms = new ArrayList<>();
-        long listSize = films.size();
-        for (int i = 0; i < limit + 1 && i < listSize; i++) {
-            resultFilms.add(films.get(i));
+        return listTopPopularFilms;
+    }
+
+    private List<Film> getFilmsSortedByPopularity() throws ResponseStatusException {
+        List<Film> allFilms = new ArrayList<>(filmStorage.getAllFilms());
+        if (allFilms.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Список фильмов пока еще пуст");
         }
-        return resultFilms;
+        allFilms.sort(Comparator.comparingInt((Film film) -> film.getLikes().size()).reversed());
+        return allFilms;
     }
 
     private void checkingFilmAndUser(long filmId, long userId) throws ResponseStatusException {
