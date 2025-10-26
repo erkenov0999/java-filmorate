@@ -56,15 +56,13 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film addNewFilm(Film film) {
         log.info("Добавление нового фильма: {}", film.getName());
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("films")
-                .usingGeneratedKeyColumns("id");
-        Long filmId = simpleJdbcInsert.executeAndReturnKey(filmToMap(film))
-                .longValue();
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).
+                withTableName("films").
+                usingGeneratedKeyColumns("id");
+        Long filmId = simpleJdbcInsert.executeAndReturnKey(filmToMap(film)).longValue();
         film.setId(filmId);
         log.info("Фильм успешно добавлен с ID: {}", filmId);
-        return getFilmById(filmId).
-                orElse(null);
+        return getFilmById(filmId).orElse(null);
     }
 
     @Override
@@ -83,8 +81,7 @@ public class FilmDbStorage implements FilmStorage {
             return null;
         }
         log.info("Фильм с ID {} успешно обновлен", film.getId());
-        return getFilmById(film.getId()).
-                orElse(null);
+        return getFilmById(film.getId()).orElse(null);
     }
 
     @Override
