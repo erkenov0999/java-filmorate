@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.interfaces.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.genres.interfaces.GenresStorage;
+import ru.yandex.practicum.filmorate.storage.filmlikes.interfaces.FilmLikesStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,6 +27,7 @@ public class FilmService {
     private final FilmGenresStorage filmGenresStorage;
     private final MpaStorage mpaStorage;
     private final GenresStorage genresStorage;
+    private final FilmLikesStorage filmLikesStorage;
     private List<Film> topFilms = new ArrayList<>();
 
     public Film addNewFilm(Film film) {
@@ -113,6 +115,8 @@ public class FilmService {
                     "Пользователь с ID " + idUser + " уже поставил лайк данному фильму.");
         }
         film.getLikes().add(idUser);
+        // Сохраняем лайк в БД
+        filmLikesStorage.addLikeFilm(idFilm, idUser);
         updateAndSortFilms();
         log.info("Пользователь с идентификатором {} поставил лайк на фильм с id {}.", idUser, film.getId());
     }
@@ -127,6 +131,8 @@ public class FilmService {
         Film film = filmOpt.get();
         // Удаляем лайк, даже если его не было
         film.getLikes().remove(idUser);
+        // Удаляем лайк из БД
+        filmLikesStorage.removeLikeFilm(idFilm, idUser);
         updateAndSortFilms();
         log.info("Пользователь {} убрал лайк с фильма с id {}", idUser, film.getId());
     }

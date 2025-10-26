@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.interfaces.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.genres.interfaces.GenresStorage;
+import ru.yandex.practicum.filmorate.storage.filmlikes.interfaces.FilmLikesStorage;
 
 import java.time.LocalDate;
 
@@ -33,7 +34,8 @@ class FilmServiceTest {
         filmGenresStorage = null; // В реальном тесте будет зависимость
         MpaStorage mpaStorage = null;
         GenresStorage genresStorage = null;
-        filmService = new FilmService(filmStorage, userStorage, filmGenresStorage, mpaStorage, genresStorage);
+        FilmLikesStorage filmLikesStorage = null;
+        filmService = new FilmService(filmStorage, userStorage, filmGenresStorage, mpaStorage, genresStorage, filmLikesStorage);
 
         testFilm = new Film("Test Film", "Test Description", LocalDate.of(2020, 1, 1), 120);
         testFilm.setId(1L);

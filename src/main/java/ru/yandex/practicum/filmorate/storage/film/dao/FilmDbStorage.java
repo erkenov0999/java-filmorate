@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
+import ru.yandex.practicum.filmorate.storage.filmlikes.interfaces.FilmLikesStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmGenresStorage filmGenresStorage;
+    private final FilmLikesStorage filmLikesStorage;
 
     private RowMapper<Film> getFilmMapper() {
         return (rs, rowNum) -> {
@@ -39,6 +41,8 @@ public class FilmDbStorage implements FilmStorage {
             film.setMpa(mpa);
             // Загружаем жанры для фильма
             film.getGenres().addAll(filmGenresStorage.getGenresByFilmId(film.getId()));
+            // Загружаем лайки для фильма
+            film.getLikes().addAll(filmLikesStorage.getLikersIdsByFilmId(film.getId()));
             return film;
         };
     }

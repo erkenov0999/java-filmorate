@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.user.interfaces.UserStorage;
 import ru.yandex.practicum.filmorate.storage.filmgenres.interfaces.FilmGenresStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.interfaces.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.genres.interfaces.GenresStorage;
+import ru.yandex.practicum.filmorate.storage.filmlikes.interfaces.FilmLikesStorage;
 
 import java.time.LocalDate;
 
@@ -30,7 +31,8 @@ class FilmControllerTest {
         FilmGenresStorage filmGenresStorage = null;
         MpaStorage mpaStorage = null;
         GenresStorage genresStorage = null;
-        filmService = new FilmService(filmStorage, userStorage, filmGenresStorage, mpaStorage, genresStorage);
+        FilmLikesStorage filmLikesStorage = null;
+        filmService = new FilmService(filmStorage, userStorage, filmGenresStorage, mpaStorage, genresStorage, filmLikesStorage);
         filmController = new FilmController(filmService);
     }
 
