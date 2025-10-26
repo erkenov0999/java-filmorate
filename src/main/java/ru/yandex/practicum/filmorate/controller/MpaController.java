@@ -26,8 +26,6 @@ public class MpaController {
     @GetMapping("/{id}")
     public Mpa getMpaById(@PathVariable int id) {
         log.info("Получение рейтинга MPA с ID: {}", id);
-        return mpaService.findById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "MPA рейтинг с ID " + id + " не найден"));
+        return mpaService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "MPA рейтинг с ID " + id + " не найден"));
     }
 }
