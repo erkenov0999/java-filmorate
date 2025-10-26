@@ -45,8 +45,8 @@ public class FilmController {
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable long id) {
         log.info("Получение фильма с ID: {}", id);
-        return filmService.getFilmById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, 
+        return filmService.getFilmById(id).
+                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Фильм с ID " + id + " не найден"));
     }
 
