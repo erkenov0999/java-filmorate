@@ -33,10 +33,8 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     "Пользователь для обновления не найден ID = " + userId);
         }
-
         checkAndFillName(user);
         User updatedUser = userStorage.updateUser(user);
-
         Set<Long> friends = user.getFriends();
         removeAllFriends(userId, friends);
         addFriends(userId, friends);
@@ -162,8 +160,7 @@ public class UserService {
 
     public User getUserById(long id) {
         log.info("Получение пользователя с ID: {}", id);
-        return userStorage.findUserById(id).
-                orElse(null);
+        return userStorage.findUserById(id).orElse(null);
     }
 
     public User checkAndFillName(User user) {
