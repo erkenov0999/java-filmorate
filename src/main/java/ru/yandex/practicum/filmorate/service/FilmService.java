@@ -34,7 +34,6 @@ public class FilmService {
                     filmGenresStorage.addFilmGenre(savedFilm.getId(), genre.getId())
             );
         }
-        
         return savedFilm;
     }
 
@@ -48,7 +47,6 @@ public class FilmService {
                     filmGenresStorage.addFilmGenre(film.getId(), genre.getId())
             );
         }
-        
         return updatedFilm;
     }
 
@@ -69,21 +67,18 @@ public class FilmService {
 
     public void putLike(long idFilm, long idUser) throws ResponseStatusException {
         checkingFilmAndUser(idFilm, idUser);
-
         Optional<Film> filmOpt = filmStorage.getFilmById(idFilm);
         if (filmOpt.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
         }
         Film film = filmOpt.get();
-
         if (film.getLikes().contains(idUser)) {
             log.error("Попытка повторно поставить лайк фильму");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Пользователь с ID " + idUser + " уже поставил лайк данному фильму.");
         }
-
         film.getLikes().add(idUser);
-        updateAndSortFilms(film);
+        updateAndSortFilms();
         log.info("Пользователь с идентификатором {} поставил лайк на фильм с id {}.", idUser, film.getId());
     }
 
@@ -95,20 +90,18 @@ public class FilmService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Фильм не найден");
         }
         Film film = filmOpt.get();
-
         if (!film.getLikes().contains(idUser)) {
             log.error("Попытка убрать не существующий лайк");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Убрать лайк нельзя, так как пользователь c id " + idUser
                             + " не ставил лайк на фильм с id " + film.getId());
         }
-
         film.getLikes().remove(idUser);
-        updateAndSortFilms(film);
+        updateAndSortFilms();
         log.info("Пользователь {} убрал лайк с фильма с id {}", idUser, film.getId());
     }
 
-    private void updateAndSortFilms(Film film) throws ResponseStatusException {
+    private void updateAndSortFilms() throws ResponseStatusException {
         List<Film> films = new ArrayList<>(filmStorage.getAllFilms());
         if (films.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Список фильмов пока еще пуст");
@@ -128,7 +121,6 @@ public class FilmService {
         films.sort(Comparator.comparingInt((Film movie) -> movie.getLikes().size()).reversed());
         List<Film> resultFilms = new ArrayList<>();
         long listSize = films.size();
-
         for (int i = 0; i < limit && i < listSize; i++) {
             resultFilms.add(films.get(i));
         }
