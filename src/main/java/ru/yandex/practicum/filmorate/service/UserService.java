@@ -162,8 +162,8 @@ public class UserService {
 
     public User getUserById(long id) {
         log.info("Получение пользователя с ID: {}", id);
-        return userStorage.findUserById(id)
-                .orElse(null);
+        return userStorage.findUserById(id).
+                orElse(null);
     }
 
     public User checkAndFillName(User user) {

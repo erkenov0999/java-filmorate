@@ -30,8 +30,8 @@ public class FilmService {
         // Сохраняем жанры фильма
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             filmGenresStorage.deleteFilmGenresByFilmId(savedFilm.getId());
-            film.getGenres().forEach(genre -> 
-                filmGenresStorage.addFilmGenre(savedFilm.getId(), genre.getId())
+            film.getGenres().forEach(genre ->
+                    filmGenresStorage.addFilmGenre(savedFilm.getId(), genre.getId())
             );
         }
         
@@ -44,8 +44,8 @@ public class FilmService {
         // Обновляем жанры фильма
         if (film.getGenres() != null) {
             filmGenresStorage.deleteFilmGenresByFilmId(film.getId());
-            film.getGenres().forEach(genre -> 
-                filmGenresStorage.addFilmGenre(film.getId(), genre.getId())
+            film.getGenres().forEach(genre ->
+                    filmGenresStorage.addFilmGenre(film.getId(), genre.getId())
             );
         }
         
